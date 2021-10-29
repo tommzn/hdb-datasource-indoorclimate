@@ -14,10 +14,6 @@ jobs:
     steps:
       - name: Set output
         run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/*/}" >> $GITHUB_ENV
-      - name: Set output
-        run: |
-          echo $RELEASE_VERSION
-          echo $GITHUB_REF
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Get Go version
@@ -42,7 +38,7 @@ jobs:
           context: ./k8s
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}/_${{ matrix.arch }}:${{ github.sha }}
-            ghcr.io/${{ github.repository }}_${{ matrix.arch }}:latest
+            ghcr.io/${{ github.repository }}/${{ matrix.arch }}:$RELEASE_VERSION
+            ghcr.io/${{ github.repository }}${{ matrix.arch }}:latest
   
         
