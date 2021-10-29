@@ -108,9 +108,10 @@ func (suite *ConsumerTestSuite) TestIntegration() {
 	consumer.targets = append(consumer.targets, collector)
 
 	suite.runConsumer(consumer, false)
-	publishTestMessage(consumer.mqttOptions())
+	time.Sleep(1 * time.Second)
+	suite.Nil(publishTestMessage(consumer.mqttOptions()))
 
-	time.Sleep(100 * time.Millisecond)
+	time.Sleep(1 * time.Second)
 	suite.cancelFunc()
 	suite.waitGroup.Wait()
 	suite.Len(collector.(*collectorTarget).messages, 1)
@@ -119,7 +120,7 @@ func (suite *ConsumerTestSuite) TestIntegration() {
 func (suite *ConsumerTestSuite) TestConnectionLostHandler() {
 
 	consumer := messageConsumerForTest(nil)
-	suite.runConsumer(consumer, true)
+	suite.runConsumer(consumer, false)
 
 	opts := consumer.mqttOptions()
 	opts.AutoReconnect = false
@@ -145,16 +146,15 @@ func (suite *ConsumerTestSuite) TestConnectionError() {
 
 func (suite *ConsumerTestSuite) runConsumer(consumer core.Collector, shouldReturnWithError bool) {
 
-	errChan := make(chan error, 1)
 	suite.waitGroup.Add(1)
 	go func() {
 		defer suite.waitGroup.Done()
-		errChan <- consumer.Run(suite.ctx)
-		suite.Equal(shouldReturnWithError, len(errChan) == 1)
+		err := consumer.Run(suite.ctx)
+		suite.Equal(shouldReturnWithError, err != nil)
 	}()
 }
 
-func publishTestMessage(opts *mqtt.ClientOptions) {
+func publishTestMessage(opts *mqtt.ClientOptions) error {
 
 	topic := "/ble/0/1a:1a:1a:1a:1a:1a/temperature"
 	opts.SetClientID("test_publisher")
@@ -163,6 +163,8 @@ func publishTestMessage(opts *mqtt.ClientOptions) {
 		panic(token.Error())
 	}
 	token := mqttClient.Publish(topic, 0, false, "23.5")
-	token.Wait()
-	mqttClient.Disconnect(100)
+	<-token.Done()
+	err := token.Error()
+	mqttClient.Disconnect(500)
+	return err
 }

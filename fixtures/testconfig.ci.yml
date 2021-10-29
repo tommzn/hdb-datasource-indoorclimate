@@ -1,0 +1,7 @@
+
+log:
+  type: local
+  loglevel: debug
+
+mqtt:
+  broker: mqtt
