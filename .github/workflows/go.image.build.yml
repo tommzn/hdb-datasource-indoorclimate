@@ -12,10 +12,12 @@ jobs:
       matrix:
         arch: [amd64, arm64]
     steps:
-      - name: Set env
-        run: echo ::set-env name=RELEASE_VERSION::$(echo ${GITHUB_REF:10})
-      - name: Check output
-        run: echo $RELEASE_VERSION
+      - name: Set output
+        id: vars
+        run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
+        run: |
+          echo $RELEASE_VERSION
+          echo $GITHUB_REF
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Get Go version
@@ -40,7 +42,7 @@ jobs:
           context: ./k8s
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}_${{ matrix.arch }}:${{ github.sha }}
+            ghcr.io/${{ github.repository }}/_${{ matrix.arch }}:${{ github.sha }}
             ghcr.io/${{ github.repository }}_${{ matrix.arch }}:latest
   
         
