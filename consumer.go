@@ -3,6 +3,8 @@ package indoorclimate
 import (
 	"context"
 	"fmt"
+	"net/url"
+	"strings"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	config "github.com/tommzn/go-config"
@@ -29,7 +31,7 @@ func (client *MqttClient) Run(ctx context.Context) error {
 	mqttClient := mqtt.NewClient(opts)
 
 	if token := mqttClient.Connect(); token.Wait() && token.Error() != nil {
-		client.logger.Error("Unable to connect to broker, reason: ", token.Error())
+		client.logger.Errorf("Unable to connect to broker (%s), reason: %s", brokerList(opts.Servers), token.Error())
 		return token.Error()
 	}
 	mqttClient.SubscribeMultiple(filters, client.processMessage)
@@ -46,7 +48,8 @@ func (client *MqttClient) connectHandler(mqttClient mqtt.Client) {
 }
 
 func (client *MqttClient) connectionLostHandler(mqttClient mqtt.Client, err error) {
-	client.logger.Info("Connection to MQTT broker lost, reason: ", err.Error())
+	opts := mqttClient.OptionsReader()
+	client.logger.Infof("Connection to MQTT broker lost: %s, reason: %s", brokerList(opts.Servers()), err.Error())
 }
 
 func (client *MqttClient) mqttTopicFilters() map[string]byte {
@@ -72,7 +75,7 @@ func (client *MqttClient) processMessage(mqttClient mqtt.Client, message mqtt.Me
 
 	measurementType := extractMeasurementType(message.Topic())
 	if measurementType == nil {
-		client.logger.Error("Unable to get measurement tyoe from topic: ", message.Topic())
+		client.logger.Error("Unable to get measurement type from topic: ", message.Topic())
 		return
 	}
 
@@ -111,4 +114,12 @@ func (client *MqttClient) credentialsProvider() (username string, password strin
 		password = *mqttPassword
 	}
 	return username, password
+}
+
+func brokerList(urls []*url.URL) string {
+	broker := []string{}
+	for _, url := range urls {
+		broker = append(broker, url.Host)
+	}
+	return strings.Join(broker, ",")
 }
