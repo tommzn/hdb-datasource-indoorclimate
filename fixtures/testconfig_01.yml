@@ -1,0 +1,7 @@
+
+log:
+  type: local
+  loglevel: debug
+
+mqtt:
+  topic_prefix: abc
