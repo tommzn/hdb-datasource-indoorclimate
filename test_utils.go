@@ -1,8 +1,6 @@
 package indoorclimate
 
 import (
-	"os"
-
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	config "github.com/tommzn/go-config"
 	log "github.com/tommzn/go-log"
@@ -12,12 +10,7 @@ import (
 // loadConfigForTest loads test config.
 func loadConfigForTest(fileName *string) config.Config {
 
-	var configFile string
-	if _, isCI := os.LookupEnv("CI"); isCI {
-		configFile = "fixtures/testconfig.ci.yml"
-	} else {
-		configFile = "fixtures/testconfig.yml"
-	}
+	configFile := "fixtures/testconfig.yml"
 	if fileName != nil {
 		configFile = *fileName
 	}

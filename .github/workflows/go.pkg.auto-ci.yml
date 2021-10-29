@@ -10,6 +10,11 @@ jobs:
       matrix:
         platform: [ubuntu-latest]
     runs-on: ${{ matrix.platform }}
+    services:
+      mqtt:
+        image: eclipse-mosquitto:1.6
+        ports:
+          1883:1883
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -19,12 +24,6 @@ jobs:
         uses: actions/setup-go@v2
         with:
           go-version: ${{ env.goversion }}
-      - name: Start Mosquitto
-        uses: namoshek/mosquitto-github-action@v1
-        with:
-          version: '1.6'
-          ports: '1883:1883 8883:8883'
-          container-name: 'mqtt'
       - name: Run tests
         run: go test -v  -covermode=count ./...
         env:
