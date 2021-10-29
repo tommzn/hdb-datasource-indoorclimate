@@ -40,6 +40,6 @@ jobs:
           push: true
           tags: |
             ghcr.io/${{ github.repository }}/${{ matrix.arch }}:${{ steps.release.outputs.tag }}
-            ghcr.io/${{ github.repository }}${{ matrix.arch }}:latest
+            ghcr.io/${{ github.repository }}/${{ matrix.arch }}:latest
   
         
