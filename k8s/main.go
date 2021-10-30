@@ -48,7 +48,9 @@ func loadConfig() config.Config {
 
 // newSecretsManager retruns a new secrets manager from passed config.
 func newSecretsManager(conf config.Config) secrets.SecretsManager {
-	return secrets.NewSecretsManagerByConfig(conf)
+	secretsManager := secrets.NewSecretsManagerByConfig(conf)
+	secrets.ExportToEnvironment([]string{"AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"}, secretsManager)
+	return secretsManager
 }
 
 // newLogger creates a new logger from  passed config.
