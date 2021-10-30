@@ -2,8 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
-	"io/ioutil"
 
 	config "github.com/tommzn/go-config"
 	log "github.com/tommzn/go-log"
@@ -14,15 +12,6 @@ import (
 )
 
 func main() {
-
-	files, err := ioutil.ReadDir("/run/secrets/token")
-	if err != nil {
-		panic(err)
-	}
-
-	for _, f := range files {
-		fmt.Println(f.Name())
-	}
 
 	ctx := context.Background()
 	collector, err := bootstrap()
@@ -35,8 +24,8 @@ func main() {
 // bootstrap loads config and creates a new scheduled collector with a exchangerate datasource.
 func bootstrap() (core.Collector, error) {
 
+	secretsManager := newSecretsManager()
 	conf := loadConfig()
-	secretsManager := newSecretsManager(conf)
 	logger := newLogger(conf, secretsManager)
 	datasource := indoorclimate.New(conf, logger, secretsManager)
 	return core.NewContinuousCollector(datasource, logger), nil
@@ -57,9 +46,9 @@ func loadConfig() config.Config {
 	return conf
 }
 
-// newSecretsManager retruns a new secrets manager from passed config.
-func newSecretsManager(conf config.Config) secrets.SecretsManager {
-	secretsManager := secrets.NewSecretsManagerByConfig(conf)
+// newSecretsManager retruns a new container secrets manager
+func newSecretsManager() secrets.SecretsManager {
+	secretsManager := secrets.NewDockerecretsManager("/run/secrets/token")
 	secrets.ExportToEnvironment([]string{"AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"}, secretsManager)
 	return secretsManager
 }
