@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"fmt"
+	"io/ioutil"
 
 	config "github.com/tommzn/go-config"
 	log "github.com/tommzn/go-log"
@@ -12,6 +14,15 @@ import (
 )
 
 func main() {
+
+	files, err := ioutil.ReadDir("/run/secrets/token")
+	if err != nil {
+		panic(err)
+	}
+
+	for _, f := range files {
+		fmt.Println(f.Name())
+	}
 
 	ctx := context.Background()
 	collector, err := bootstrap()
