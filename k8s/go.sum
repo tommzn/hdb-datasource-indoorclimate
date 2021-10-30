@@ -358,6 +358,8 @@ github.com/tommzn/hdb-datasource-core v1.1.1 h1:UR9zDu2ehxFsm61xy7mFhpYFWgKU8jWP
 github.com/tommzn/hdb-datasource-core v1.1.1/go.mod h1:K+7tS/YITSjgLxNOsGpVW3DB7WS1rJK2u6vW6taICeQ=
 github.com/tommzn/hdb-datasource-indoorclimate v1.0.0 h1:x9GFLD1TxT+7i2d8k9n7aVTnFDrk2Iv0hwxft6AXMjo=
 github.com/tommzn/hdb-datasource-indoorclimate v1.0.0/go.mod h1:778x4sgRzNhmhiFWxuhy/25o+1YvR7P6a5Lpko11C4A=
+github.com/tommzn/hdb-datasource-indoorclimate v1.0.1 h1:8OmTYAaJpisNhHXIZbVk7WT78Vjp2Cl7JsZHw3Xf6BY=
+github.com/tommzn/hdb-datasource-indoorclimate v1.0.1/go.mod h1:778x4sgRzNhmhiFWxuhy/25o+1YvR7P6a5Lpko11C4A=
 github.com/tommzn/hdb-events-go v1.0.6 h1:rBOw8ZgIlOpR9q7KrQQw3qJwbGgdq6wBQMFQZjYv8CQ=
 github.com/tommzn/hdb-events-go v1.0.6/go.mod h1:Pi0wRugUxNO81wqM4lFoie1C6oE8zUbq4h4TjSgvBi4=
 github.com/urfave/cli/v2 v2.2.0/go.mod h1:SE9GqnLQmjVa0iPEY0f1w3ygNIYcIJ0OKPMoW2caLfQ=
