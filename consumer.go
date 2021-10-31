@@ -26,6 +26,8 @@ func New(conf config.Config, logger log.Logger, secretsManager secrets.SecretsMa
 
 func (client *MqttClient) Run(ctx context.Context) error {
 
+	defer client.logger.Flush()
+
 	filters := client.mqttTopicFilters()
 	opts := client.mqttOptions()
 	mqttClient := mqtt.NewClient(opts)
@@ -45,11 +47,13 @@ func (client *MqttClient) Run(ctx context.Context) error {
 
 func (client *MqttClient) connectHandler(mqttClient mqtt.Client) {
 	client.logger.Info("Connected to MQTT broker.")
+	client.logger.Flush()
 }
 
 func (client *MqttClient) connectionLostHandler(mqttClient mqtt.Client, err error) {
 	opts := mqttClient.OptionsReader()
 	client.logger.Infof("Connection to MQTT broker lost: %s, reason: %s", brokerList(opts.Servers()), err.Error())
+	client.logger.Flush()
 }
 
 func (client *MqttClient) mqttTopicFilters() map[string]byte {
