@@ -1,4 +1,3 @@
-
 [![Go Reference](https://pkg.go.dev/badge/github.com/tommzn/hdb-datasource-indoorclimate.svg)](https://pkg.go.dev/github.com/tommzn/hdb-datasource-indoorclimate)
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/tommzn/hdb-datasource-indoorclimate)
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/tommzn/hdb-datasource-indoorclimate)
@@ -8,40 +7,45 @@
 # HomeDashboard Indoor Climate DataSource
 Fetches indoor climate data from a MQTT broker and publishes to HomebDaskboard backend.
 
+## Topics
+This indoor climate consumer subscribes to MQTT topics for Bluetooth data send from ioBroker to consume indoor climate data like temperature, humidity and battery status of a sensor.
+You can specific a prefix for this three topics by config.
+
 ## Config
-Config have to contain URL of an exchange rate API and a list of currencie pairs an exchange rate should be fetched.
+Config can be used to specific MQTT broker, port and a prefix for topics.
 More details about loading config at https://github.com/tommzn/go-config
 
 ### Config example
 ```yaml
-exchangerate:
-  url: "https://api.frankfurter.app/latest"
-  date_format: "2006-01-02"
-  conversions:
-    - from: "EUR"
-      to: "USD"
-    - from: "USD"
-      to: "EUR"
+mqtt:
+  topic_prefix: iobroker
+  broker: mqtt-broker-01
+  port: 1883
 ```
 
+## Targets
+[MessgeTarget](https://github.com/tommzn/hdb-datasource-indoorclimate/blob/main/interfaces.go) interface is used for destinations indoor climate data are send to. By default a consumer contains a log target, only. You can register additional targets using 
+
 ## Usage
-After creating a new datasource, you can fetch specified exchange rates. If anything works well Fetch will return a [exchange rates struct](https://github.com/tommzn/hdb-events-go/blob/main/exchangerate.pb.go) or otherwise an error.
+After creating a new collector you can call it's Run method to start consuming new indoor climate data from MQTT broker. By default all received indoor climate data are send
+to default target which is a logger, only. Collector will run until you cancel passed context.
 ```golang
 
     import (
-       exchangerate "github.com/tommzn/hdb-datasource-exchangerate"  
-       events "github.com/tommzn/hdb-events-go"  
+       indoorclimate "github.com/tommzn/hdb-datasource-indoorclimate"  
+       config "github.com/tommzn/go-config"
+	     log "github.com/tommzn/go-log"
+	     secrets "github.com/tommzn/go-secrets"
     )
     
-    datasource, err := exchangerate.New(config)
+    collector, err := indoorclimate.New(conf, logger, secretsmanager)
     if err != nil {
         panic(err)
     }
 
-    weatherData, err := datasource.Fetch()
+    ctx, cancelFunc := context.WithCancel(context.Background())
+    err := collector.Run(ctx)
     if err != nil {
         panic(err)
     }
-
-    fmt.Printf("Exchange Rates: %d\n", len(weatherData.(events.ExchangeRates).Rates))
 ```
