@@ -1,5 +1,6 @@
 package indoorclimate
 
-type messageTarget interface {
-	send(IndorrClimate) error
+// MessageTarget is uses as destination for received indoor climate data.
+type MessageTarget interface {
+	Send(IndorrClimate) error
 }

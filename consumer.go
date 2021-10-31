@@ -20,7 +20,7 @@ func New(conf config.Config, logger log.Logger, secretsManager secrets.SecretsMa
 		conf:           conf,
 		logger:         logger,
 		secretsManager: secretsManager,
-		targets:        []messageTarget{newLogTarget(logger)},
+		targets:        []MessageTarget{newLogTarget(logger)},
 	}
 }
 
@@ -91,7 +91,7 @@ func (client *MqttClient) processMessage(mqttClient mqtt.Client, message mqtt.Me
 		},
 	}
 	for _, target := range client.targets {
-		target.send(indoorClimate)
+		target.Send(indoorClimate)
 	}
 }
 

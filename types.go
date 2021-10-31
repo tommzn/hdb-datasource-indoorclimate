@@ -10,7 +10,7 @@ type MqttClient struct {
 	conf           config.Config
 	secretsManager secrets.SecretsManager
 	logger         log.Logger
-	targets        []messageTarget
+	targets        []MessageTarget
 }
 
 type logTarget struct {

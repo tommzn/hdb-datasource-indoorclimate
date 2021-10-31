@@ -2,25 +2,29 @@ package indoorclimate
 
 import log "github.com/tommzn/go-log"
 
-func newLogTarget(logger log.Logger) messageTarget {
+// newLogTarget returns a new message target which logs passed indoor climate data.
+func newLogTarget(logger log.Logger) MessageTarget {
 	return &logTarget{
 		logger: logger,
 	}
 }
 
-func (target *logTarget) send(indoorClimate IndorrClimate) error {
+// Send passed indoor climate date to a logger.
+func (target *logTarget) Send(indoorClimate IndorrClimate) error {
 	target.logger.Infof("IndoorCliemate, Device: %s, Type: %s, Value: %s",
 		indoorClimate.DeviceId, indoorClimate.Reading.Type, indoorClimate.Reading.Value)
 	return nil
 }
 
-func newCollectorTarget() messageTarget {
+// newCollectorTarget returns a new message target which collects passed indoor climate data locally.
+func newCollectorTarget() MessageTarget {
 	return &collectorTarget{
 		messages: []IndorrClimate{},
 	}
 }
 
-func (target *collectorTarget) send(indoorClimate IndorrClimate) error {
+// Send will append passed indoor climate data to local storage.
+func (target *collectorTarget) Send(indoorClimate IndorrClimate) error {
 	target.messages = append(target.messages, indoorClimate)
 	return nil
 }
