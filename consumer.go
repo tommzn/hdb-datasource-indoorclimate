@@ -13,13 +13,12 @@ import (
 	config "github.com/tommzn/go-config"
 	log "github.com/tommzn/go-log"
 	secrets "github.com/tommzn/go-secrets"
-	core "github.com/tommzn/hdb-datasource-core"
 	events "github.com/tommzn/hdb-events-go"
 )
 
 const MQTT_CLIENT_ID = "indoorclimate_consumer"
 
-func New(conf config.Config, logger log.Logger, secretsManager secrets.SecretsManager) core.Collector {
+func New(conf config.Config, logger log.Logger, secretsManager secrets.SecretsManager) Collector {
 	return &MqttClient{
 		conf:           conf,
 		logger:         logger,
