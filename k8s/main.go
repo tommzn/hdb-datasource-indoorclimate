@@ -28,7 +28,7 @@ func bootstrap() (core.Collector, error) {
 	conf := loadConfig()
 	logger := newLogger(conf, secretsManager)
 	datasource := indoorclimate.New(conf, logger, secretsManager)
-	datasource.AppendMessageTarget(indoorclimate.NewSqsTarget(conf.logger))
+	datasource.AppendMessageTarget(indoorclimate.NewSqsTarget(conf, logger))
 	return core.NewContinuousCollector(datasource, logger), nil
 }
 
