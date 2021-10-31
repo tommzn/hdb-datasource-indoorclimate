@@ -5,12 +5,16 @@ import (
 	"fmt"
 	"net/url"
 	"strings"
+	"time"
+
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	config "github.com/tommzn/go-config"
 	log "github.com/tommzn/go-log"
 	secrets "github.com/tommzn/go-secrets"
 	core "github.com/tommzn/hdb-datasource-core"
+	events "github.com/tommzn/hdb-events-go"
 )
 
 const MQTT_CLIENT_ID = "indoorclimate_consumer"
@@ -89,26 +93,31 @@ func (client *MqttClient) processMessage(mqttClient mqtt.Client, message mqtt.Me
 		return
 	}
 
-	measurementType := extractMeasurementType(message.Topic())
-	if measurementType == nil {
-		client.logger.Error("Unable to get measurement type from topic: ", message.Topic())
+	measurementTypeString := extractMeasurementType(message.Topic())
+	if measurementTypeString == nil {
+		client.logger.Error("Unable to extract measurement type from topic: ", message.Topic())
 		return
 	}
 
-	indoorClimate := IndorrClimate{
-		DeviceId: *deviceId,
-		Reading: Measurement{
-			Type:  *measurementType,
-			Value: string(message.Payload()),
-		},
+	measurementType, ok := events.MeasurementType_value[strings.ToUpper(*measurementTypeString)]
+	if !ok {
+		client.logger.Error("Unable to get measurement type for: ", measurementTypeString)
+		return
+	}
+
+	indoorClimate := events.IndoorClimate{
+		DeviceId:  *deviceId,
+		Timestamp: timestamppb.New(time.Now()),
+		Type:      events.MeasurementType(measurementType),
+		Value:     string(message.Payload()),
 	}
 	for _, target := range client.targets {
 		target.Send(indoorClimate)
 	}
 }
 
-// processMessage defines options to connect to a MQTT broker.
-func (client *MqttClient) processMessage() *mqtt.ClientOptions {
+// mqttOptions defines options to connect to a MQTT broker.
+func (client *MqttClient) mqttOptions() *mqtt.ClientOptions {
 
 	broker := client.conf.Get("mqtt.broker", config.AsStringPtr("localhost"))
 	port := client.conf.GetAsInt("mqtt.port", config.AsIntPtr(1883))

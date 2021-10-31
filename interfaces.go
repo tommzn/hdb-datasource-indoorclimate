@@ -1,6 +1,9 @@
 package indoorclimate
 
-import core "github.com/tommzn/hdb-datasource-core"
+import (
+	core "github.com/tommzn/hdb-datasource-core"
+	events "github.com/tommzn/hdb-events-go"
+)
 
 type Collector interface {
 
@@ -16,5 +19,5 @@ type Collector interface {
 type MessageTarget interface {
 
 	// Send passed indoor climate data to defined destination.
-	Send(IndorrClimate) error
+	Send(events.IndoorClimate) error
 }

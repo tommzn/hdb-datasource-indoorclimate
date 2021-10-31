@@ -4,6 +4,7 @@ import (
 	config "github.com/tommzn/go-config"
 	log "github.com/tommzn/go-log"
 	secrets "github.com/tommzn/go-secrets"
+	events "github.com/tommzn/hdb-events-go"
 )
 
 type MqttClient struct {
@@ -18,19 +19,10 @@ type logTarget struct {
 }
 
 type collectorTarget struct {
-	messages []IndorrClimate
+	messages []events.IndoorClimate
 }
 
 // messageHandler is used to process messages received from a MQTT topic.
 type messageHandler struct {
 	logger log.Logger
-}
-
-type IndorrClimate struct {
-	DeviceId string
-	Reading  Measurement
-}
-
-type Measurement struct {
-	Type, Value string
 }
