@@ -1,6 +1,7 @@
 package indoorclimate
 
 import (
+	"regexp"
 	"testing"
 
 	"github.com/stretchr/testify/suite"
@@ -50,4 +51,13 @@ func (suite *UtilsTestSuite) TestExtractMeasurementType() {
 
 	suite.Nil(extractMeasurementType("iobroker.ble.0.a4:f3:e6:b8:d1:c6.temperature"))
 	suite.Nil(extractMeasurementType("iobroker/ble/0/a4:f3:e6:b8:d1:c6/temperature/"))
+}
+
+func (suite *UtilsTestSuite) TestGenerateRandomSuffix() {
+
+	length := 5
+	randomSuffix := randStringBytes(length)
+	suite.Len(randomSuffix, length)
+	match, _ := regexp.MatchString("[a-z0-9]{5}", randomSuffix)
+	suite.True(match)
 }

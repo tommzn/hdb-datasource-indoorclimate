@@ -1,6 +1,7 @@
 package indoorclimate
 
 import (
+	"math/rand"
 	"regexp"
 	"strings"
 )
@@ -37,4 +38,15 @@ func topicsToSubsrcibe(prefix *string) []string {
 		}
 	}
 	return topics
+}
+
+const letterBytes = "abcdefghijklmnopqrstuvwxyz1234567890"
+
+// randStringBytes returns random bytes of given length from letterBytes.
+func randStringBytes(n int) string {
+	b := make([]byte, n)
+	for i := range b {
+		b[i] = letterBytes[rand.Intn(len(letterBytes))]
+	}
+	return string(b)
 }
