@@ -16,8 +16,10 @@ import (
 	events "github.com/tommzn/hdb-events-go"
 )
 
+// MQTT_CLIENT_ID to be used at MQTT connections
 const MQTT_CLIENT_ID = "indoorclimate_consumer"
 
+// New returns a new MQTT client to subscribe to topics and process messages.
 func New(conf config.Config, logger log.Logger, secretsManager secrets.SecretsManager) Collector {
 	return &MqttClient{
 		conf:           conf,
