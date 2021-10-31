@@ -11,8 +11,15 @@ Fetches indoor climate data from a MQTT broker and publishes to HomebDaskboard b
 This indoor climate consumer subscribes to MQTT topics for Bluetooth data send from ioBroker to consume indoor climate data like temperature, humidity and battery status of a sensor.
 You can specific a prefix for this three topics by config.
 
+### Consumed Topics
+| Measurement Type      | Topic                |
+| --------------------- | -------------------- |
+| Temperature           | /ble/+/+/temperature |
+| Humidity              | /ble/+/+/humidity    |
+| Device Battery Status | /ble/+/+/battery     |
+
 ## Config
-Config can be used to specific MQTT broker, port and a prefix for topics.
+Config can be used to specific MQTT broker, port and a prefix for topics. If nothing has been defined it tries to connect to a MQTT broker at localhost:1883 and subscribes to ioBroker topics with indoor climate data send for Bluetooth devices.
 More details about loading config at https://github.com/tommzn/go-config
 
 ### Config example
