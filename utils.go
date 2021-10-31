@@ -17,6 +17,7 @@ func extractDeviceId(topic string) *string {
 	return nil
 }
 
+// extractMeasurementType returns topic suffix which is used as measurement type.
 func extractMeasurementType(topic string) *string {
 
 	if !strings.Contains(topic, "/") || strings.HasSuffix(topic, "/") {

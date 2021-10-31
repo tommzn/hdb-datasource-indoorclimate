@@ -24,6 +24,13 @@ func New(conf config.Config, logger log.Logger, secretsManager secrets.SecretsMa
 	}
 }
 
+// AppendMessageTarget add passed target to the internal stack.
+func (client *MqttClient) AppendMessageTarget(target MessageTarget) {
+	client.targets = append(client.targets, target)
+}
+
+// run creates a MQTT client, connects to a given brokcer and listen for indoor climate data.
+// Will run until passed context has been canceled.
 func (client *MqttClient) Run(ctx context.Context) error {
 
 	defer client.logger.Flush()
@@ -45,17 +52,20 @@ func (client *MqttClient) Run(ctx context.Context) error {
 	return nil
 }
 
+// connectHandler is called after successful connection to a MQTT broker.
 func (client *MqttClient) connectHandler(mqttClient mqtt.Client) {
 	client.logger.Info("Connected to MQTT broker.")
 	client.logger.Flush()
 }
 
+// connectionLostHandler is called if connection to a MQTT broker get lost.
 func (client *MqttClient) connectionLostHandler(mqttClient mqtt.Client, err error) {
 	opts := mqttClient.OptionsReader()
 	client.logger.Infof("Connection to MQTT broker lost: %s, reason: %s", brokerList(opts.Servers()), err.Error())
 	client.logger.Flush()
 }
 
+// mqttTopicFilters adds a prefix to consumed topics if defined.
 func (client *MqttClient) mqttTopicFilters() map[string]byte {
 
 	filters := make(map[string]byte)
@@ -66,6 +76,8 @@ func (client *MqttClient) mqttTopicFilters() map[string]byte {
 	return filters
 }
 
+// processMessage is called after a new message has been received from MQTT topic.
+// It will convert reeived data to indoor climate data and calls all message targets in local stack in sequence.
 func (client *MqttClient) processMessage(mqttClient mqtt.Client, message mqtt.Message) {
 
 	defer client.logger.Flush()
@@ -95,7 +107,8 @@ func (client *MqttClient) processMessage(mqttClient mqtt.Client, message mqtt.Me
 	}
 }
 
-func (client *MqttClient) mqttOptions() *mqtt.ClientOptions {
+// processMessage defines options to connect to a MQTT broker.
+func (client *MqttClient) processMessage() *mqtt.ClientOptions {
 
 	broker := client.conf.Get("mqtt.broker", config.AsStringPtr("localhost"))
 	port := client.conf.GetAsInt("mqtt.port", config.AsIntPtr(1883))
@@ -109,6 +122,7 @@ func (client *MqttClient) mqttOptions() *mqtt.ClientOptions {
 	return opts
 }
 
+// credentialsProvider will return user name and password if provided by local secrets mananger.
 func (client *MqttClient) credentialsProvider() (username string, password string) {
 
 	mqttUser, _ := client.secretsManager.Obtain("TSL_MQTT_USER")
@@ -120,6 +134,7 @@ func (client *MqttClient) credentialsProvider() (username string, password strin
 	return username, password
 }
 
+// brokerList converts a list of broker urls to a single string.
 func brokerList(urls []*url.URL) string {
 	broker := []string{}
 	for _, url := range urls {
