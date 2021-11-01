@@ -359,6 +359,8 @@ github.com/tommzn/go-config v1.0.5 h1:fhXq5rVvONUKDq/zmFvHWq2r/1CjaQ9WsYiHyOnvaD
 github.com/tommzn/go-config v1.0.5/go.mod h1:K+ta7gkX32lSS+6tIIH9ttuhr35tV4AMAzOC640aRKE=
 github.com/tommzn/go-log v1.0.2 h1:soEGqiHstXOB1zVu5360NmlN4KfRg49zvQwztuvTPvo=
 github.com/tommzn/go-log v1.0.2/go.mod h1:xB+EJtRRPcR+4oeenhSvKKeNq4Mqr2GjHEz1lJtYDZo=
+github.com/tommzn/go-log v1.1.0 h1:x4UQPH7sQznhWfz34WC8JKyFjkYmZT8ZHrcv+nfyI1c=
+github.com/tommzn/go-log v1.1.0/go.mod h1:xB+EJtRRPcR+4oeenhSvKKeNq4Mqr2GjHEz1lJtYDZo=
 github.com/tommzn/go-secrets v1.0.0 h1:TVDf0ky3gRX2QDCCPDXsyLdxQ/6gBxCSxbzgpv6Q0I0=
 github.com/tommzn/go-secrets v1.0.0/go.mod h1:ZCiO/36WGUEgk5K7+S3U/JKIp4ghe5OA2fkckVN32/8=
 github.com/tommzn/go-utils v1.0.1 h1:GSPyGFBcucd17ZxRRyFYTLcgHo+p+SZoWfHKzt32kJg=

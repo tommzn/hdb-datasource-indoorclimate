@@ -14,7 +14,7 @@ func newLogTarget(logger log.Logger) MessageTarget {
 
 // Send passed indoor climate date to a logger.
 func (target *logTarget) Send(indoorClimate events.IndoorClimate) error {
-	target.logger.Infof("IndoorCliemate, Device: %s, Type: %s, Value: %s",
+	target.logger.Statusf("IndoorCliemate, Device: %s, Type: %s, Value: %s",
 		indoorClimate.DeviceId, indoorClimate.Type, indoorClimate.Value)
 	return nil
 }
