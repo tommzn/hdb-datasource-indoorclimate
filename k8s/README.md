@@ -16,3 +16,7 @@ mqtt:
   topic_prefix: iobroker
   broker: mqtt-broker-01
   port: 1883
+
+  # Links
+- [HomeDashboard Documentation](https://github.com/tommzn/hdb-docs/wiki)
+

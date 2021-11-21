@@ -56,3 +56,6 @@ to default target which is a logger, only. Collector will run until you cancel p
         panic(err)
     }
 ```
+
+# Links
+- [HomeDashboard Documentation](https://github.com/tommzn/hdb-docs/wiki)
