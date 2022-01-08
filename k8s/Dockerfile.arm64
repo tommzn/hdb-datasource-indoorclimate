@@ -1,0 +1,7 @@
+FROM arm64v8/alpine:latest
+
+WORKDIR /go
+
+COPY --chmod=0755 build_artifact_bin k8s-bin
+
+ENTRYPOINT ["/go/k8s-bin"]
