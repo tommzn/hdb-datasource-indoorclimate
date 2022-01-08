@@ -54,15 +54,8 @@ func (client *MqttClient) Run(ctx context.Context) error {
 		return token.Error()
 	}
 
-	fmt.Println("Subsribe to topic: test/events")
-	if token := mqttClient.Subscribe("test/events", 0, client.testMessageHandler); token.Wait() && token.Error() != nil {
-		client.logger.Errorf("Unable to subsribe to topics, reason: %s", token.Error())
-	}
-	fmt.Println("Topic: test/# subsribed!")
-
-	fmt.Println("Listening...")
 	<-ctx.Done()
-	fmt.Println("Stopped!")
+	client.logger.Debug("Stop message consuming!")
 	if mqttClient.IsConnected() {
 		mqttClient.Disconnect(0)
 	}
@@ -73,7 +66,6 @@ func (client *MqttClient) Run(ctx context.Context) error {
 func (client *MqttClient) connectHandler(mqttClient mqtt.Client) {
 	client.logger.Info("Connected to MQTT broker.")
 	client.logger.Flush()
-	fmt.Println("Connected to MQTT broker.")
 }
 
 // connectionLostHandler is called if connection to a MQTT broker get lost.
@@ -81,7 +73,6 @@ func (client *MqttClient) connectionLostHandler(mqttClient mqtt.Client, err erro
 	opts := mqttClient.OptionsReader()
 	client.logger.Infof("Connection to MQTT broker lost: %s, reason: %s", brokerList(opts.Servers()), err.Error())
 	client.logger.Flush()
-	fmt.Printf("Connection to MQTT broker lost: %s, reason: %s\n", brokerList(opts.Servers()), err.Error())
 }
 
 // mqttTopicFilters adds a prefix to consumed topics if defined.
@@ -131,10 +122,6 @@ func (client *MqttClient) processMessage(mqttClient mqtt.Client, message mqtt.Me
 	}
 }
 
-func (client *MqttClient) testMessageHandler(mqttClient mqtt.Client, message mqtt.Message) {
-	fmt.Printf("Test Message received: %s, Topic: %s\n", message.Payload(), message.Topic())
-}
-
 // mqttOptions defines options to connect to a MQTT broker.
 func (client *MqttClient) mqttOptions() *mqtt.ClientOptions {
 
@@ -142,15 +129,14 @@ func (client *MqttClient) mqttOptions() *mqtt.ClientOptions {
 	port := client.conf.GetAsInt("mqtt.port", config.AsIntPtr(1883))
 	opts := mqtt.NewClientOptions()
 	brokerUrl := fmt.Sprintf("tcp://%s:%d", *broker, *port)
-	fmt.Printf("Broker: %s\n", brokerUrl)
 	opts.AddBroker(brokerUrl)
 	clientId := MQTT_CLIENT_ID + "_" + randStringBytes(5)
-	fmt.Printf("ClientId: %s\n", clientId)
 	opts.SetClientID(clientId)
+	opts.AutoReconnect = true
+	client.logger.Debugf("MQTT Opts: %s", opts)
 	opts.CredentialsProvider = client.credentialsProvider
 	opts.OnConnect = client.connectHandler
 	opts.OnConnectionLost = client.connectionLostHandler
-	opts.AutoReconnect = true
 	return opts
 }
 
