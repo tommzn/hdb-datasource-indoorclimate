@@ -57,3 +57,4 @@ spec:
               value: <path to config file>
             - name: AWS_REGION
               value: eu-west-1
+              

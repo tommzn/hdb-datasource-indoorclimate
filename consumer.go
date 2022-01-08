@@ -48,7 +48,15 @@ func (client *MqttClient) Run(ctx context.Context) error {
 		client.logger.Errorf("Unable to connect to broker (%s), reason: %s", brokerList(opts.Servers), token.Error())
 		return token.Error()
 	}
-	mqttClient.SubscribeMultiple(filters, client.processMessage)
+
+	if token := mqttClient.SubscribeMultiple(filters, client.processMessage); token.Wait() && token.Error() != nil {
+		client.logger.Errorf("Unable to subsribe to topics, reason: %s", token.Error())
+		return token.Error()
+	}
+
+	if token := mqttClient.Subscribe("test/#", 0, client.testMessageHandler); token.Wait() && token.Error() != nil {
+		client.logger.Errorf("Unable to subsribe to topics, reason: %s", token.Error())
+	}
 
 	<-ctx.Done()
 	if mqttClient.IsConnected() {
@@ -115,6 +123,10 @@ func (client *MqttClient) processMessage(mqttClient mqtt.Client, message mqtt.Me
 	for _, target := range client.targets {
 		target.Send(indoorClimate)
 	}
+}
+
+func (client *MqttClient) testMessageHandler(mqttClient mqtt.Client, message mqtt.Message) {
+	fmt.Printf("Test Message received: %s, Topic: %s\n", message.Payload(), message.Topic())
 }
 
 // mqttOptions defines options to connect to a MQTT broker.
