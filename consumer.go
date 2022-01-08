@@ -144,7 +144,9 @@ func (client *MqttClient) mqttOptions() *mqtt.ClientOptions {
 	brokerUrl := fmt.Sprintf("tcp://%s:%d", *broker, *port)
 	fmt.Printf("Broker: %s\n", brokerUrl)
 	opts.AddBroker(brokerUrl)
-	opts.SetClientID(MQTT_CLIENT_ID + "_" + randStringBytes(5))
+	clientId := MQTT_CLIENT_ID + "_" + randStringBytes(5)
+	fmt.Printf("ClientId: %s\n", clientId)
+	opts.SetClientID(clientId)
 	opts.CredentialsProvider = client.credentialsProvider
 	opts.OnConnect = client.connectHandler
 	opts.OnConnectionLost = client.connectionLostHandler
