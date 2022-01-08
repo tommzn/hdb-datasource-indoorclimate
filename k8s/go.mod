@@ -8,7 +8,7 @@ require (
 	github.com/tommzn/go-log v1.1.0
 	github.com/tommzn/go-secrets v1.0.2
 	github.com/tommzn/hdb-datasource-core v1.2.0
-	github.com/tommzn/hdb-datasource-indoorclimate v1.2.10
+	github.com/tommzn/hdb-datasource-indoorclimate v1.2.11
 	golang.org/x/net v0.0.0-20211029224645-99673261e6eb // indirect
 	golang.org/x/sys v0.0.0-20211031064116-611d5d643895 // indirect
 )
