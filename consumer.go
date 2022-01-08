@@ -54,9 +54,11 @@ func (client *MqttClient) Run(ctx context.Context) error {
 		return token.Error()
 	}
 
+	fmt.Println("Subsribe to topic: test/#")
 	if token := mqttClient.Subscribe("test/#", 0, client.testMessageHandler); token.Wait() && token.Error() != nil {
 		client.logger.Errorf("Unable to subsribe to topics, reason: %s", token.Error())
 	}
+	fmt.Println("Topic: test/# subsribed!")
 
 	<-ctx.Done()
 	if mqttClient.IsConnected() {
