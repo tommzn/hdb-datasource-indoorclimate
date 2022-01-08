@@ -54,13 +54,15 @@ func (client *MqttClient) Run(ctx context.Context) error {
 		return token.Error()
 	}
 
-	fmt.Println("Subsribe to topic: test/#")
-	if token := mqttClient.Subscribe("test/#", 0, client.testMessageHandler); token.Wait() && token.Error() != nil {
+	fmt.Println("Subsribe to topic: test/events")
+	if token := mqttClient.Subscribe("test/events", 0, client.testMessageHandler); token.Wait() && token.Error() != nil {
 		client.logger.Errorf("Unable to subsribe to topics, reason: %s", token.Error())
 	}
 	fmt.Println("Topic: test/# subsribed!")
 
+	fmt.Println("Listening...")
 	<-ctx.Done()
+	fmt.Println("Stopped!")
 	if mqttClient.IsConnected() {
 		mqttClient.Disconnect(0)
 	}
@@ -71,6 +73,7 @@ func (client *MqttClient) Run(ctx context.Context) error {
 func (client *MqttClient) connectHandler(mqttClient mqtt.Client) {
 	client.logger.Info("Connected to MQTT broker.")
 	client.logger.Flush()
+	fmt.Println("Connected to MQTT broker.")
 }
 
 // connectionLostHandler is called if connection to a MQTT broker get lost.
@@ -78,6 +81,7 @@ func (client *MqttClient) connectionLostHandler(mqttClient mqtt.Client, err erro
 	opts := mqttClient.OptionsReader()
 	client.logger.Infof("Connection to MQTT broker lost: %s, reason: %s", brokerList(opts.Servers()), err.Error())
 	client.logger.Flush()
+	fmt.Printf("Connection to MQTT broker lost: %s, reason: %s\n", brokerList(opts.Servers()), err.Error())
 }
 
 // mqttTopicFilters adds a prefix to consumed topics if defined.
@@ -137,7 +141,9 @@ func (client *MqttClient) mqttOptions() *mqtt.ClientOptions {
 	broker := client.conf.Get("mqtt.broker", config.AsStringPtr("localhost"))
 	port := client.conf.GetAsInt("mqtt.port", config.AsIntPtr(1883))
 	opts := mqtt.NewClientOptions()
-	opts.AddBroker(fmt.Sprintf("tcp://%s:%d", *broker, *port))
+	brokerUrl := fmt.Sprintf("tcp://%s:%d", *broker, *port)
+	fmt.Printf("Broker: %s\n", brokerUrl)
+	opts.AddBroker(brokerUrl)
 	opts.SetClientID(MQTT_CLIENT_ID + "_" + randStringBytes(5))
 	opts.CredentialsProvider = client.credentialsProvider
 	opts.OnConnect = client.connectHandler
