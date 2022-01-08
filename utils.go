@@ -4,6 +4,7 @@ import (
 	"math/rand"
 	"regexp"
 	"strings"
+	"time"
 )
 
 // extractDeviceId try to extract a device id, a mac address, from given topic.
@@ -44,6 +45,7 @@ const letterBytes = "abcdefghijklmnopqrstuvwxyz1234567890"
 
 // randStringBytes returns random bytes of given length from letterBytes.
 func randStringBytes(n int) string {
+	rand.Seed(time.Now().UnixNano())
 	b := make([]byte, n)
 	for i := range b {
 		b[i] = letterBytes[rand.Intn(len(letterBytes))]
