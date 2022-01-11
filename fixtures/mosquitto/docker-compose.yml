@@ -1,0 +1,14 @@
+version: "3"
+
+services:
+  mosquitto:
+    image: eclipse-mosquitto
+    volumes:
+      - ./conf:/mosquitto/config
+    #network_mode: "host"
+    ports:
+      - 1883:1883
+      - 9001:9001
+
+      
+    
