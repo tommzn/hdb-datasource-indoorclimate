@@ -357,6 +357,8 @@ github.com/tommzn/go-log v1.1.0 h1:x4UQPH7sQznhWfz34WC8JKyFjkYmZT8ZHrcv+nfyI1c=
 github.com/tommzn/go-log v1.1.0/go.mod h1:xB+EJtRRPcR+4oeenhSvKKeNq4Mqr2GjHEz1lJtYDZo=
 github.com/tommzn/go-metrics v1.0.0 h1:PbEOUBYd/YUYzLvBPPCYZR99Qf3/AKxItO3WavBuUDQ=
 github.com/tommzn/go-metrics v1.0.0/go.mod h1:cGVgmVebHyXasXXTVax9RN9gGFxDQ79DtAPM9Ywbljw=
+github.com/tommzn/go-metrics v1.0.1 h1:1S+4A4FQ8D+ZoRojpWTzuryshOmJnAU2/+hj4b4nxQk=
+github.com/tommzn/go-metrics v1.0.1/go.mod h1:cGVgmVebHyXasXXTVax9RN9gGFxDQ79DtAPM9Ywbljw=
 github.com/tommzn/go-secrets v1.0.0 h1:TVDf0ky3gRX2QDCCPDXsyLdxQ/6gBxCSxbzgpv6Q0I0=
 github.com/tommzn/go-secrets v1.0.0/go.mod h1:ZCiO/36WGUEgk5K7+S3U/JKIp4ghe5OA2fkckVN32/8=
 github.com/tommzn/go-secrets v1.0.1 h1:wT/cqOz7Y4LIztX2OIhZo/uBt+Mgmtkr16ezJI3ASds=
@@ -402,6 +404,8 @@ github.com/tommzn/hdb-datasource-indoorclimate v1.2.13 h1:aF2UM/36m6PTnOrt+KXhGu
 github.com/tommzn/hdb-datasource-indoorclimate v1.2.13/go.mod h1:T3IiJKN7W8teYeL56EFu2a5OpDAFA7GWEEIFEY1ssuk=
 github.com/tommzn/hdb-datasource-indoorclimate v1.2.14 h1:xKubACVQnSzcUfis0oHONa/vE7GEKmKYrIa5wJ6Ne3w=
 github.com/tommzn/hdb-datasource-indoorclimate v1.2.14/go.mod h1:T3IiJKN7W8teYeL56EFu2a5OpDAFA7GWEEIFEY1ssuk=
+github.com/tommzn/hdb-datasource-indoorclimate v1.2.15 h1:yuzBmd9Fr1aK4tXJdOrz8F4SU1cr+2808ifTmMikh9Q=
+github.com/tommzn/hdb-datasource-indoorclimate v1.2.15/go.mod h1:i7PoZ/lkJs1zILcrqkgsBRHH3mxI+2+8Rkni1VHLVbY=
 github.com/tommzn/hdb-events-go v1.0.6 h1:rBOw8ZgIlOpR9q7KrQQw3qJwbGgdq6wBQMFQZjYv8CQ=
 github.com/tommzn/hdb-events-go v1.0.6/go.mod h1:Pi0wRugUxNO81wqM4lFoie1C6oE8zUbq4h4TjSgvBi4=
 github.com/tommzn/hdb-events-go v1.0.7 h1:VBWCQGtMQRA0z/hPqOLVU/9KN0u9H2iLJ0umvfbtQsQ=
