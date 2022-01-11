@@ -41,7 +41,6 @@ func (client *MqttClient) AppendMessageTarget(target MessageTarget) {
 func (client *MqttClient) Run(ctx context.Context) error {
 
 	defer client.logger.Flush()
-	defer client.metricPublisher.Flush()
 
 	filters := client.mqttTopicFilters()
 	opts := client.mqttOptions()
@@ -61,6 +60,11 @@ func (client *MqttClient) Run(ctx context.Context) error {
 	client.logger.Debug("Stop message consuming!")
 	if mqttClient.IsConnected() {
 		mqttClient.Disconnect(0)
+	}
+
+	client.metricPublisher.Flush()
+	if err := client.metricPublisher.Error(); err != nil {
+		client.logger.Error(err)
 	}
 	return nil
 }
@@ -120,9 +124,13 @@ func (client *MqttClient) processMessage(mqttClient mqtt.Client, message mqtt.Me
 		Type:      events.MeasurementType(measurementType),
 		Value:     string(message.Payload()),
 	}
-	client.metricPublisher.Send(createMeasurement(indoorClimate))
 	for _, target := range client.targets {
 		target.Send(indoorClimate)
+	}
+
+	client.metricPublisher.Send(createMeasurement(indoorClimate))
+	if err := client.metricPublisher.Error(); err != nil {
+		client.logger.Error(err)
 	}
 }
 
