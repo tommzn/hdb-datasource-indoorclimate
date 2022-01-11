@@ -12,6 +12,7 @@ import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	config "github.com/tommzn/go-config"
 	log "github.com/tommzn/go-log"
+	metrics "github.com/tommzn/go-metrics"
 	secrets "github.com/tommzn/go-secrets"
 	events "github.com/tommzn/hdb-events-go"
 )
@@ -22,10 +23,11 @@ const MQTT_CLIENT_ID = "indoorclimate_consumer"
 // New returns a new MQTT client to subscribe to topics and process messages.
 func New(conf config.Config, logger log.Logger, secretsManager secrets.SecretsManager) Collector {
 	return &MqttClient{
-		conf:           conf,
-		logger:         logger,
-		secretsManager: secretsManager,
-		targets:        []MessageTarget{newLogTarget(logger)},
+		conf:            conf,
+		logger:          logger,
+		secretsManager:  secretsManager,
+		targets:         []MessageTarget{newLogTarget(logger)},
+		metricPublisher: metrics.NewTimestreamPublisher(conf, logger),
 	}
 }
 
@@ -39,6 +41,7 @@ func (client *MqttClient) AppendMessageTarget(target MessageTarget) {
 func (client *MqttClient) Run(ctx context.Context) error {
 
 	defer client.logger.Flush()
+	defer client.metricPublisher.Flush()
 
 	filters := client.mqttTopicFilters()
 	opts := client.mqttOptions()
@@ -117,6 +120,7 @@ func (client *MqttClient) processMessage(mqttClient mqtt.Client, message mqtt.Me
 		Type:      events.MeasurementType(measurementType),
 		Value:     string(message.Payload()),
 	}
+	client.metricPublisher.Send(createMeasurement(indoorClimate))
 	for _, target := range client.targets {
 		target.Send(indoorClimate)
 	}
@@ -159,4 +163,30 @@ func brokerList(urls []*url.URL) string {
 		broker = append(broker, url.Host)
 	}
 	return strings.Join(broker, ",")
+}
+
+func createMeasurement(indoorClimate events.IndoorClimate) metrics.Measurement {
+	return metrics.Measurement{
+		MetricName: "hdb-datasource-indoorclimate",
+		Tags: []metrics.MeasurementTag{
+			metrics.MeasurementTag{
+				Name:  "deviceid",
+				Value: indoorClimate.DeviceId,
+			},
+			metrics.MeasurementTag{
+				Name:  "type",
+				Value: indoorClimate.Type.String(),
+			},
+		},
+		Values: []metrics.MeasurementValue{
+			metrics.MeasurementValue{
+				Name:  "count",
+				Value: 1,
+			},
+			metrics.MeasurementValue{
+				Name:  indoorClimate.Type.String(),
+				Value: indoorClimate.Value,
+			},
+		},
+	}
 }
