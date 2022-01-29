@@ -5,6 +5,8 @@ import (
 	"regexp"
 	"strings"
 	"time"
+
+	config "github.com/tommzn/go-config"
 )
 
 // extractDeviceId try to extract a device id, a mac address, from given topic.
@@ -51,4 +53,36 @@ func randStringBytes(n int) string {
 		b[i] = letterBytes[rand.Intn(len(letterBytes))]
 	}
 	return string(b)
+}
+
+// devicesFromConfig will load devices and their characteristics from given config.
+func devicesFromConfig(conf config.Config) []Device {
+
+	devices := []Device{}
+	characteristics := []Characteristic{}
+
+	characteristicsConfig := conf.GetAsSliceOfMaps("indoorclimate.characteristics")
+	for _, characteristicConfig := range characteristicsConfig {
+		if uuid, ok := characteristicConfig["uuid"]; ok {
+			if measurementType, ok := characteristicConfig["type"]; ok {
+				characteristics = append(characteristics,
+					Characteristic{
+						uuid:            uuid,
+						measurementType: measurementType,
+					})
+			}
+		}
+	}
+
+	devicesConfig := conf.GetAsSliceOfMaps("indoorclimate.devices")
+	for _, deviceConfig := range devicesConfig {
+		if deviceId, ok := deviceConfig["id"]; ok {
+			device := Device{
+				deviceId:        deviceId,
+				characteristics: characteristics,
+			}
+			devices = append(devices, device)
+		}
+	}
+	return devices
 }

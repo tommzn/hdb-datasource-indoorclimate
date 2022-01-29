@@ -61,3 +61,14 @@ func (suite *UtilsTestSuite) TestGenerateRandomSuffix() {
 	match, _ := regexp.MatchString("[a-z0-9]{5}", randomSuffix)
 	suite.True(match)
 }
+
+func (suite *UtilsTestSuite) TestGetDevicesFromConfig() {
+
+	conf := loadConfigForTest(nil)
+	devices := devicesFromConfig(conf)
+	suite.Len(devices, 1)
+	suite.NotEqual("", devices[0].deviceId)
+	suite.Len(devices[0].characteristics, 3)
+	suite.NotEqual("", devices[0].characteristics[0].uuid)
+	suite.NotEqual("", devices[0].characteristics[0].measurementType)
+}

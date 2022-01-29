@@ -1,6 +1,9 @@
 package indoorclimate
 
 import (
+	"time"
+
+	btdevice "github.com/muka/go-bluetooth/bluez/profile/device"
 	config "github.com/tommzn/go-config"
 	log "github.com/tommzn/go-log"
 	metrics "github.com/tommzn/go-metrics"
@@ -38,4 +41,37 @@ type collectorTarget struct {
 // messageHandler is used to process messages received from a MQTT topic.
 type messageHandler struct {
 	logger log.Logger
+}
+
+// IndoorClimateSensor is used to fetch tem eprature, humidiy and bettery status
+// from a Xiaomi Mijia (LYWSD03MMC) indoor climate sensor.
+type IndoorClimateSensor struct {
+	adapterId string
+	deviceId  string
+	device    *btdevice.Device1
+}
+
+// IndoorClimateMeasurement is a metric read from a sensor device.
+type IndoorClimateMeasurement struct {
+	DeviceId  string
+	Timestamp time.Time
+	Type      events.MeasurementType
+	Value     string
+}
+
+// LogPublisher will log indoor climate measuremnts.
+type LogPublisher struct {
+	logger log.Logger
+}
+
+// Device is a sensor which will be used to obtain indoor climate data.
+type Device struct {
+	deviceId        string
+	characteristics []Characteristic
+}
+
+// Characteristic is a songle sensor value.
+type Characteristic struct {
+	uuid            string
+	measurementType string
 }

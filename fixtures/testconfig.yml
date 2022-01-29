@@ -2,3 +2,15 @@
 log:
   type: local
   loglevel: debug
+
+indoorclimate:
+  devices:
+    - id: AA:11:BB:22:CC:33
+  characteristics:
+    - uuid: "00002a6e-0000-1000-8000-00805f9b34fb"
+      type: "temperature"
+    - uuid: "00002a6f-0000-1000-8000-00805f9b34fb"
+      type: "humidity"
+    - uuid: "00002a19-0000-1000-8000-00805f9b34fb"
+      type: "battery"
+    
