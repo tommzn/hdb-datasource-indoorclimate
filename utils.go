@@ -1,12 +1,14 @@
 package indoorclimate
 
 import (
+	"fmt"
 	"math/rand"
 	"regexp"
 	"strings"
 	"time"
 
 	config "github.com/tommzn/go-config"
+	events "github.com/tommzn/hdb-events-go"
 )
 
 // extractDeviceId try to extract a device id, a mac address, from given topic.
@@ -55,34 +57,47 @@ func randStringBytes(n int) string {
 	return string(b)
 }
 
-// devicesFromConfig will load devices and their characteristics from given config.
-func devicesFromConfig(conf config.Config) []Device {
+// deviceIdsFromConfig will load devices and their characteristics from given config.
+func deviceIdsFromConfig(conf config.Config) []string {
 
-	devices := []Device{}
-	characteristics := []Characteristic{}
-
-	characteristicsConfig := conf.GetAsSliceOfMaps("indoorclimate.characteristics")
-	for _, characteristicConfig := range characteristicsConfig {
-		if uuid, ok := characteristicConfig["uuid"]; ok {
-			if measurementType, ok := characteristicConfig["type"]; ok {
-				characteristics = append(characteristics,
-					Characteristic{
-						uuid:            uuid,
-						measurementType: measurementType,
-					})
-			}
-		}
-	}
-
+	devices := []string{}
 	devicesConfig := conf.GetAsSliceOfMaps("indoorclimate.devices")
 	for _, deviceConfig := range devicesConfig {
 		if deviceId, ok := deviceConfig["id"]; ok {
-			device := Device{
-				deviceId:        deviceId,
-				characteristics: characteristics,
-			}
-			devices = append(devices, device)
+			devices = append(devices, deviceId)
 		}
 	}
 	return devices
+}
+
+// characteristicsFromConfig will load uuid and type for all relevant
+// sensor characteristics which should be fetches for indoor climate
+func characteristicsFromConfig(conf config.Config) []Characteristic {
+
+	characteristics := []Characteristic{}
+	characteristicsConfig := conf.GetAsSliceOfMaps("indoorclimate.characteristics")
+	for _, characteristicConfig := range characteristicsConfig {
+		if uuid, ok := characteristicConfig["uuid"]; ok {
+			if measurementTypeStr, ok := characteristicConfig["type"]; ok {
+				if measurementType, err := toMeasurementType(measurementTypeStr); err == nil {
+					characteristics = append(characteristics,
+						Characteristic{
+							uuid:            uuid,
+							measurementType: *measurementType,
+						})
+				}
+
+			}
+		}
+	}
+	return characteristics
+}
+
+func toMeasurementType(measurementType string) (*events.MeasurementType, error) {
+	if val, ok := events.MeasurementType_value[strings.ToUpper(measurementType)]; ok {
+		convertedType := events.MeasurementType(val)
+		return &convertedType, nil
+	} else {
+		return nil, fmt.Errorf("Invalid measurement type value: %s", measurementType)
+	}
 }

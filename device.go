@@ -14,6 +14,11 @@ func NewIndoorClimateSensor(adapterId, deviceId string) SensorDevice {
 	}
 }
 
+// ID returns sensor device id.
+func (sensor *IndoorClimateSensor) Id() string {
+	return sensor.deviceId
+}
+
 // Connect will try to connect to a device and will return with an error if failing.
 func (sensor *IndoorClimateSensor) Connect() error {
 

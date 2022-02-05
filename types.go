@@ -8,6 +8,7 @@ import (
 	log "github.com/tommzn/go-log"
 	metrics "github.com/tommzn/go-metrics"
 	secrets "github.com/tommzn/go-secrets"
+	utils "github.com/tommzn/go-utils"
 	core "github.com/tommzn/hdb-datasource-core"
 	events "github.com/tommzn/hdb-events-go"
 )
@@ -64,14 +65,20 @@ type LogPublisher struct {
 	logger log.Logger
 }
 
-// Device is a sensor which will be used to obtain indoor climate data.
-type Device struct {
-	deviceId        string
-	characteristics []Characteristic
-}
-
 // Characteristic is a songle sensor value.
 type Characteristic struct {
 	uuid            string
-	measurementType string
+	measurementType events.MeasurementType
+}
+
+// SensorDataCollector will try to fetch temperature, humidity and bettery status
+// from a given list of sensors.
+type SensorDataCollector struct {
+	logger          log.Logger
+	devices         []SensorDevice
+	characteristics []Characteristic
+	publisher       []Publisher
+	retryCount      int
+	errorStack      *utils.ErrorStack
+	done            chan struct{}
 }

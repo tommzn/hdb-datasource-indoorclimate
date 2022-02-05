@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/suite"
+	events "github.com/tommzn/hdb-events-go"
 )
 
 type UtilsTestSuite struct {
@@ -62,13 +63,31 @@ func (suite *UtilsTestSuite) TestGenerateRandomSuffix() {
 	suite.True(match)
 }
 
-func (suite *UtilsTestSuite) TestGetDevicesFromConfig() {
+func (suite *UtilsTestSuite) TestGetDeviceIdsFromConfig() {
 
 	conf := loadConfigForTest(nil)
-	devices := devicesFromConfig(conf)
-	suite.Len(devices, 1)
-	suite.NotEqual("", devices[0].deviceId)
-	suite.Len(devices[0].characteristics, 3)
-	suite.NotEqual("", devices[0].characteristics[0].uuid)
-	suite.NotEqual("", devices[0].characteristics[0].measurementType)
+	devices := deviceIdsFromConfig(conf)
+	suite.Len(devices, 2)
+	suite.NotEqual("", devices[0])
+}
+
+func (suite *UtilsTestSuite) TestGetCharacteristicsFromConfig() {
+
+	conf := loadConfigForTest(nil)
+	characteristics := characteristicsFromConfig(conf)
+	suite.Len(characteristics, 3)
+	suite.NotEqual("", characteristics[0].uuid)
+	suite.NotEqual("", characteristics[0].measurementType)
+}
+
+func (suite *UtilsTestSuite) TestConvertMeasurementType() {
+
+	val1, err1 := toMeasurementType("Temperature")
+	suite.NotNil(val1)
+	suite.Nil(err1)
+	suite.Equal(events.MeasurementType_TEMPERATURE, *val1)
+
+	val2, err2 := toMeasurementType("xxx")
+	suite.NotNil(err2)
+	suite.Nil(val2)
 }

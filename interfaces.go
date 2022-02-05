@@ -33,6 +33,9 @@ type Publisher interface {
 // SensorDevice represents a device to fetch indoor cliamte data.
 type SensorDevice interface {
 
+	// Returns the id of current sensor device.
+	Id() string
+
 	// Connect will try to connect to a device and will return with an error if failing.
 	Connect() error
 
