@@ -33,6 +33,7 @@ func NewSensorDataCollector(conf config.Config, logger log.Logger) core.Collecto
 	}
 }
 
+// Run will start collecting sensor data from all defined devices.
 func (collector *SensorDataCollector) Run(ctx context.Context) error {
 
 	defer collector.logger.Flush()
