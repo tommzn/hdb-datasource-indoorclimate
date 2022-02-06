@@ -1,6 +1,6 @@
 [Unit]
 Description=Sensor Data Collector
-ConditionPathExists=/home/ubuntu/work/src/sleepservice/sleepservice
+ConditionPathExists=/home/ubuntu/go/bin/sensordatacollector
 After=network.target
  
 [Service]
