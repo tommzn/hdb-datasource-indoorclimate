@@ -9,6 +9,7 @@ import (
 
 	config "github.com/tommzn/go-config"
 	events "github.com/tommzn/hdb-events-go"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // extractDeviceId try to extract a device id, a mac address, from given topic.
@@ -93,11 +94,22 @@ func characteristicsFromConfig(conf config.Config) []Characteristic {
 	return characteristics
 }
 
+// toMeasurementType converts passed measurement name to a measurement type.
 func toMeasurementType(measurementType string) (*events.MeasurementType, error) {
 	if val, ok := events.MeasurementType_value[strings.ToUpper(measurementType)]; ok {
 		convertedType := events.MeasurementType(val)
 		return &convertedType, nil
 	} else {
 		return nil, fmt.Errorf("Invalid measurement type value: %s", measurementType)
+	}
+}
+
+// toIndoorClimateDate converts passed indoor climate measurement into an event.
+func toIndoorClimateDate(measurement IndoorClimateMeasurement) events.IndoorClimate {
+	return events.IndoorClimate{
+		DeviceId:  measurement.DeviceId,
+		Timestamp: timestamppb.New(measurement.Timestamp),
+		Type:      measurement.Type,
+		Value:     measurement.Value,
 	}
 }

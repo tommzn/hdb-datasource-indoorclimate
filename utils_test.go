@@ -3,6 +3,7 @@ package indoorclimate
 import (
 	"regexp"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/suite"
 	events "github.com/tommzn/hdb-events-go"
@@ -90,4 +91,18 @@ func (suite *UtilsTestSuite) TestConvertMeasurementType() {
 	val2, err2 := toMeasurementType("xxx")
 	suite.NotNil(err2)
 	suite.Nil(val2)
+}
+
+func (suite *UtilsTestSuite) TestConvertToEvent() {
+
+	measurement := IndoorClimateMeasurement{
+		DeviceId:  "Devide01",
+		Timestamp: time.Now(),
+		Type:      events.MeasurementType_TEMPERATURE,
+		Value:     "21.5",
+	}
+	event := toIndoorClimateDate(measurement)
+	suite.Equal(measurement.Type, event.Type)
+	suite.Equal(measurement.Value, event.Value)
+	suite.Equal(measurement.DeviceId, event.DeviceId)
 }
