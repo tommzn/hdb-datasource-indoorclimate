@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/suite"
-	core "github.com/tommzn/hdb-datasource-core"
+	core "github.com/tommzn/hdb-core"
 )
 
 type SensorCollectorTestSuite struct {
@@ -22,7 +22,7 @@ func (suite *SensorCollectorTestSuite) TestGetSensorData() {
 	publisherMock := newPublisherMock()
 	collector := sensorDataCollectorForTest(publisherMock)
 
-	collector.Run(context.Background())
+	collector.Run(context.Background(), waitGroupForTest(1))
 	suite.Len(publisherMock.data, 3)
 }
 
@@ -34,7 +34,7 @@ func (suite *SensorCollectorTestSuite) TestCancelRun() {
 	readDelay := 1 * time.Second
 	collector.(*SensorDataCollector).devices[0].(*indoorClimateSensorMock).readDelay = &readDelay
 
-	err := collector.Run(ctx)
+	err := collector.Run(ctx, waitGroupForTest(1))
 	suite.NotNil(err)
 	suite.Len(publisherMock.data, 0)
 }
@@ -45,12 +45,12 @@ func (suite *SensorCollectorTestSuite) TestSensorDataReadErrror() {
 	collector := sensorDataCollectorForTest(publisherMock)
 	collector.(*SensorDataCollector).devices[0].(*indoorClimateSensorMock).shouldReturnWithError = true
 
-	err := collector.Run(context.Background())
+	err := collector.Run(context.Background(), waitGroupForTest(1))
 	suite.NotNil(err)
 	suite.Len(publisherMock.data, 0)
 }
 
-func sensorDataCollectorForTest(publisher Publisher) core.Collector {
+func sensorDataCollectorForTest(publisher Publisher) core.Runable {
 
 	conf := loadConfigForTest(nil)
 	devices := []SensorDevice{&indoorClimateSensorMock{connected: false}}

@@ -2,6 +2,7 @@ package indoorclimate
 
 import (
 	"os"
+	"sync"
 	"testing"
 	"time"
 
@@ -67,4 +68,10 @@ func skipCI(t *testing.T) {
 	if _, isSet := os.LookupEnv("CI"); isSet {
 		t.Skip("Skipping testing in CI environment")
 	}
+}
+
+func waitGroupForTest(childCount int) *sync.WaitGroup {
+	wg := &sync.WaitGroup{}
+	wg.Add(childCount)
+	return wg
 }
