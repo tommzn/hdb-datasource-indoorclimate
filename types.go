@@ -79,6 +79,7 @@ type SensorDataCollector struct {
 	characteristics []Characteristic
 	publisher       []Publisher
 	retryCount      int
+	schedule        *time.Duration
 	errorStack      *utils.ErrorStack
 	done            chan struct{}
 }

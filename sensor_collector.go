@@ -5,18 +5,18 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
-	"sync"
 	"time"
 
 	config "github.com/tommzn/go-config"
 	log "github.com/tommzn/go-log"
 	utils "github.com/tommzn/go-utils"
-	core "github.com/tommzn/hdb-core"
+	core "github.com/tommzn/hdb-datasource-core"
 	events "github.com/tommzn/hdb-events-go"
 )
 
-func NewSensorDataCollector(conf config.Config, logger log.Logger) core.Runable {
+func NewSensorDataCollector(conf config.Config, logger log.Logger) core.Collector {
 
+	schedule := conf.GetAsDuration("indoorclimate.schedule", nil)
 	retryCount := conf.GetAsInt("indoorclimate.retry", config.AsIntPtr(3))
 	adapterId := conf.Get("indoorclimate.adapter", config.AsStringPtr("hci0"))
 	deviceIds := deviceIdsFromConfig(conf)
@@ -26,6 +26,7 @@ func NewSensorDataCollector(conf config.Config, logger log.Logger) core.Runable 
 	}
 	characteristics := characteristicsFromConfig(conf)
 	return &SensorDataCollector{
+		schedule:        schedule,
 		logger:          logger,
 		devices:         devices,
 		characteristics: characteristics,
@@ -35,12 +36,21 @@ func NewSensorDataCollector(conf config.Config, logger log.Logger) core.Runable 
 }
 
 // Run will start collecting sensor data from all defined devices.
-func (collector *SensorDataCollector) Run(ctx context.Context, wg *sync.WaitGroup) error {
-
-	defer wg.Done()
-	defer collector.logger.Flush()
+func (collector *SensorDataCollector) Run(ctx context.Context) error {
 
 	collector.errorStack = utils.NewErrorStack()
+	if collector.schedule == nil {
+		collector.RunSingle(ctx)
+	} else {
+		collector.RunContinouous(ctx)
+	}
+	return collector.errorStack.AsError()
+}
+
+func (collector *SensorDataCollector) RunSingle(ctx context.Context) {
+
+	defer collector.logger.Flush()
+
 	collector.done = make(chan struct{})
 	for _, device := range collector.devices {
 
@@ -52,7 +62,22 @@ func (collector *SensorDataCollector) Run(ctx context.Context, wg *sync.WaitGrou
 			collector.errorStack.Append(errors.New("Sensor data collection has been canceled."))
 		}
 	}
-	return collector.errorStack.AsError()
+
+}
+
+func (collector *SensorDataCollector) RunContinouous(ctx context.Context) {
+
+	collector.logger.Debugf("Run continuous collection with schedule of: %s", *collector.schedule)
+	for {
+		collector.RunSingle(ctx)
+		select {
+		case <-time.After(*collector.schedule):
+			collector.logger.Debug("Restart Data collection")
+		case <-ctx.Done():
+			collector.logger.Debug("Stop sensor data collection: ", ctx.Err())
+			return
+		}
+	}
 }
 
 func (collector *SensorDataCollector) readDevciceData(device SensorDevice) {
