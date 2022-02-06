@@ -57,6 +57,13 @@ func (collector *SensorDataCollector) readDevciceData(device SensorDevice) {
 
 	defer collector.deviceDataCollectd()
 
+	err := device.Connect()
+	if err != nil {
+		collector.errorStack.Append(err)
+		return
+	}
+	defer device.Disconnect()
+
 	collector.logger.Debug("Read data from device: ", device.Id())
 	for _, characteristic := range collector.characteristics {
 

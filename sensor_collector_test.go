@@ -53,7 +53,7 @@ func (suite *SensorCollectorTestSuite) TestSensorDataReadErrror() {
 func sensorDataCollectorForTest(publisher Publisher) core.Collector {
 
 	conf := loadConfigForTest(nil)
-	devices := []SensorDevice{&indoorClimateSensorMock{}}
+	devices := []SensorDevice{&indoorClimateSensorMock{connected: false}}
 	characteristics := characteristicsFromConfig(conf)
 	return &SensorDataCollector{
 		logger:          loggerForTest(),

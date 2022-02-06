@@ -42,6 +42,7 @@ func (message *mqttMessage) Ack() {
 type indoorClimateSensorMock struct {
 	readDelay             *time.Duration
 	shouldReturnWithError bool
+	connected             bool
 }
 
 func (mock *indoorClimateSensorMock) Id() string {
@@ -49,15 +50,20 @@ func (mock *indoorClimateSensorMock) Id() string {
 }
 
 func (mock *indoorClimateSensorMock) Connect() error {
+	mock.connected = true
 	return nil
 }
 
 func (mock *indoorClimateSensorMock) Disconnect() error {
+	mock.connected = false
 	return nil
 }
 
 func (mock *indoorClimateSensorMock) ReadValue(id string) ([]byte, error) {
 
+	if !mock.connected {
+		return []byte{}, errors.New("Not connected!")
+	}
 	if mock.shouldReturnWithError {
 		return []byte{}, errors.New("Unable to read device data.")
 	}
