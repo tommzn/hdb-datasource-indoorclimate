@@ -21,20 +21,18 @@ func init() {
 func main() {
 
 	ctx := context.Background()
-	collector := bootstrap(ctx)
-
-	err := collector.Run(ctx)
-	exitOnError(err)
+	minion := bootstrap(ctx)
+	exitOnError(minion.Run(ctx))
 }
 
 // bootstrap loads config and creates a new scheduled collector with a exchangerate datasource.
-func bootstrap(ctx context.Context) core.Runable {
+func bootstrap(ctx context.Context) *core.Minion {
 
 	secretsManager := newSecretsManager()
 	conf := loadConfig()
 	logger := newLogger(conf, secretsManager, ctx)
 	datacollector := indoorclimate.NewSensorDataCollector(conf, logger)
-	return core.Minion(datacollector)
+	return core.NewMinion(datacollector)
 }
 
 // loadConfig from config file.
