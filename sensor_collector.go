@@ -5,16 +5,17 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
+	"sync"
 	"time"
 
 	config "github.com/tommzn/go-config"
 	log "github.com/tommzn/go-log"
 	utils "github.com/tommzn/go-utils"
-	core "github.com/tommzn/hdb-datasource-core"
+	core "github.com/tommzn/hdb-core"
 	events "github.com/tommzn/hdb-events-go"
 )
 
-func NewSensorDataCollector(conf config.Config, logger log.Logger) core.Collector {
+func NewSensorDataCollector(conf config.Config, logger log.Logger) core.Runable {
 
 	retryCount := conf.GetAsInt("indoorclimate.retry", config.AsIntPtr(3))
 	adapterId := conf.Get("indoorclimate.adapter", config.AsStringPtr("hci0"))
@@ -34,8 +35,9 @@ func NewSensorDataCollector(conf config.Config, logger log.Logger) core.Collecto
 }
 
 // Run will start collecting sensor data from all defined devices.
-func (collector *SensorDataCollector) Run(ctx context.Context) error {
+func (collector *SensorDataCollector) Run(ctx context.Context, wg *sync.WaitGroup) error {
 
+	defer wg.Done()
 	defer collector.logger.Flush()
 
 	collector.errorStack = utils.NewErrorStack()

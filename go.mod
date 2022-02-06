@@ -11,6 +11,7 @@ require (
 	github.com/tommzn/go-metrics v1.0.1
 	github.com/tommzn/go-secrets v1.0.0
 	github.com/tommzn/go-utils v1.0.2 // indirect
+	github.com/tommzn/hdb-core v1.0.1 // indirect
 	github.com/tommzn/hdb-datasource-core v1.2.0
 	github.com/tommzn/hdb-events-go v1.0.7
 	google.golang.org/protobuf v1.27.1

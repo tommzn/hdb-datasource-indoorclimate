@@ -8,7 +8,7 @@ import (
 	log "github.com/tommzn/go-log"
 	secrets "github.com/tommzn/go-secrets"
 
-	core "github.com/tommzn/hdb-datasource-core"
+	core "github.com/tommzn/hdb-core"
 	indoorclimate "github.com/tommzn/hdb-datasource-indoorclimate"
 )
 
@@ -28,13 +28,13 @@ func main() {
 }
 
 // bootstrap loads config and creates a new scheduled collector with a exchangerate datasource.
-func bootstrap(ctx context.Context) core.Collector {
+func bootstrap(ctx context.Context) core.Runable {
 
 	secretsManager := newSecretsManager()
 	conf := loadConfig()
 	logger := newLogger(conf, secretsManager, ctx)
 	datacollector := indoorclimate.NewSensorDataCollector(conf, logger)
-	return core.NewContinuousCollector(datacollector, logger)
+	return core.Minion(datacollector)
 }
 
 // loadConfig from config file.
