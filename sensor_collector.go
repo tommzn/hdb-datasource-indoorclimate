@@ -25,12 +25,16 @@ func NewSensorDataCollector(conf config.Config, logger log.Logger) core.Collecto
 		devices = append(devices, NewIndoorClimateSensor(*adapterId, deviceId))
 	}
 	characteristics := characteristicsFromConfig(conf)
+	publisher := []Publisher{newLogPublisher(logger)}
+	if queue := conf.GetAsDuration("hdb.queue", nil); queue != nil {
+		publisher = append(publisher, NewSqsTarget(conf, logger))
+	}
 	return &SensorDataCollector{
 		schedule:        schedule,
 		logger:          logger,
 		devices:         devices,
 		characteristics: characteristics,
-		publisher:       []Publisher{newLogPublisher(logger)},
+		publisher:       publisher,
 		retryCount:      *retryCount,
 	}
 }
@@ -134,7 +138,7 @@ func (collector *SensorDataCollector) publish(deviceId string, measurementType e
 		Value:     value,
 	}
 	for _, publisher := range collector.publisher {
-		publisher.Send(measurement)
+		publisher.Sendeasurement(measurement)
 	}
 }
 

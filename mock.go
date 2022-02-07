@@ -96,7 +96,7 @@ type publisherMock struct {
 	data []IndoorClimateMeasurement
 }
 
-func (mock *publisherMock) Send(measurement IndoorClimateMeasurement) error {
+func (mock *publisherMock) Sendeasurement(measurement IndoorClimateMeasurement) error {
 	mock.data = append(mock.data, measurement)
 	return nil
 }

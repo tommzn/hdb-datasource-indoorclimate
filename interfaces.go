@@ -26,8 +26,8 @@ type MessageTarget interface {
 // Publisher sends given measuremnts to different targets.
 type Publisher interface {
 
-	// Send will start to transfer passed measurement to a target.
-	Send(IndoorClimateMeasurement) error
+	// Sendeasurement will start to transfer passed measurement to a target.
+	Sendeasurement(IndoorClimateMeasurement) error
 }
 
 // SensorDevice represents a device to fetch indoor cliamte data.

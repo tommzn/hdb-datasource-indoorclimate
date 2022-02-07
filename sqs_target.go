@@ -8,7 +8,7 @@ import (
 )
 
 // NewSqsTarget creates a new publisher for AWS SQS.
-func NewSqsTarget(conf config.Config, logger log.Logger) MessageTarget {
+func NewSqsTarget(conf config.Config, logger log.Logger) *SqsTarget {
 	return &SqsTarget{
 		publisher: core.NewPublisher(conf, logger),
 	}
@@ -17,4 +17,9 @@ func NewSqsTarget(conf config.Config, logger log.Logger) MessageTarget {
 // Send given indoor climate data to AWS SQS queue.
 func (target *SqsTarget) Send(indoorClimate events.IndoorClimate) error {
 	return target.publisher.Send(&indoorClimate)
+}
+
+// Sendeasurement will start to transfer passed measurement to a target.
+func (target *SqsTarget) Sendeasurement(measurement IndoorClimateMeasurement) error {
+	return target.Send(toIndoorClimateDate(measurement))
 }
