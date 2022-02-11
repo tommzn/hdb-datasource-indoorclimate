@@ -22,6 +22,8 @@ func init() {
 
 func main() {
 
+	flag.Parse()
+
 	ctx := context.Background()
 	minion := bootstrap(ctx)
 	exitOnError(minion.Run(ctx))
