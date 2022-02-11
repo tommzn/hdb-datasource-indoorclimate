@@ -13,9 +13,11 @@ import (
 )
 
 var configFile string
+var secretsFile string
 
 func init() {
 	flag.StringVar(&configFile, "configfile", "/etc/hdb/config.yml", "Full path to config file.")
+	flag.StringVar(&secretsFile, "secretsfile", "~/.hdb/credentials", "Full path to secrets file.")
 }
 
 func main() {
@@ -45,7 +47,9 @@ func loadConfig() config.Config {
 
 // newSecretsManager retruns a new container secrets manager
 func newSecretsManager() secrets.SecretsManager {
-	return secrets.NewSecretsManager()
+	secretsManager := secrets.NewFileSecretsManager(secretsFile)
+	secrets.ExportToEnvironment([]string{"AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"}, secretsManager)
+	return secretsManager
 }
 
 // newLogger creates a new logger from  passed config.

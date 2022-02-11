@@ -30,11 +30,11 @@ require (
 	github.com/tommzn/go-config v1.0.5 // indirect
 	github.com/tommzn/go-log v1.1.0 // indirect
 	github.com/tommzn/go-metrics v1.0.1 // indirect
-	github.com/tommzn/go-secrets v1.0.2 // indirect
+	github.com/tommzn/go-secrets v1.1.0 // indirect
 	github.com/tommzn/go-utils v1.0.2 // indirect
 	github.com/tommzn/hdb-core v1.0.1 // indirect
 	github.com/tommzn/hdb-datasource-core v1.2.2 // indirect
-	github.com/tommzn/hdb-datasource-indoorclimate v1.4.3 // indirect
+	github.com/tommzn/hdb-datasource-indoorclimate v1.4.4 // indirect
 	github.com/tommzn/hdb-events-go v1.0.7 // indirect
 	golang.org/x/net v0.0.0-20211216030914-fe4d6282115f // indirect
 	golang.org/x/sys v0.0.0-20211013075003-97ac67df715c // indirect
