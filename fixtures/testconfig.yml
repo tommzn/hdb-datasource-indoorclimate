@@ -3,6 +3,15 @@ log:
   type: local
   loglevel: debug
 
+aws:
+  sqs:
+    region: eu-central-1
+  timestream:
+    region: eu-west-1
+    database: timestreamdb
+    table: timestreamtable
+    batch_size: 10
+
 indoorclimate:
   devices:
     - id: AA:11:BB:22:CC:33

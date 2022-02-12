@@ -19,7 +19,7 @@ func (target *SqsTarget) Send(indoorClimate events.IndoorClimate) error {
 	return target.publisher.Send(&indoorClimate)
 }
 
-// Sendeasurement will start to transfer passed measurement to a target.
-func (target *SqsTarget) Sendeasurement(measurement IndoorClimateMeasurement) error {
+// SendMeasurement will start to transfer passed measurement to a target.
+func (target *SqsTarget) SendMeasurement(measurement IndoorClimateMeasurement) error {
 	return target.Send(toIndoorClimateDate(measurement))
 }

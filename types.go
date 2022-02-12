@@ -34,6 +34,11 @@ type logTarget struct {
 	logger log.Logger
 }
 
+// timestreamTarget writes writes publishing metrics to AWS Timestream.
+type timestreamTarget struct {
+	metricPublisher metrics.Publisher
+}
+
 // collectorTarget collects passed infoor climate data in local storage.
 type collectorTarget struct {
 	messages []events.IndoorClimate

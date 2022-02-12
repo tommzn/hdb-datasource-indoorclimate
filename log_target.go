@@ -13,8 +13,8 @@ func newLogPublisher(logger log.Logger) Publisher {
 	}
 }
 
-// Send will write log message with level Info for passed indoor climate measurement.
-func (logPublisher *LogPublisher) Sendeasurement(measurement IndoorClimateMeasurement) error {
+// SendMeasurement will write log message with level Info for passed indoor climate measurement.
+func (logPublisher *LogPublisher) SendMeasurement(measurement IndoorClimateMeasurement) error {
 	logPublisher.logger.Infof("IndoorClimate: DeviceId: %s, TimeStamp: %s, Type: %s, Value: %s",
 		measurement.DeviceId, measurement.Timestamp.Format(time.RFC3339), measurement.Type, measurement.Value)
 	return nil
