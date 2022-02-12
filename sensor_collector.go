@@ -28,9 +28,11 @@ func NewSensorDataCollector(conf config.Config, logger log.Logger) core.Collecto
 	publisher := []Publisher{newLogPublisher(logger)}
 	if queue := conf.GetAsDuration("hdb.queue", nil); queue != nil {
 		publisher = append(publisher, NewSqsTarget(conf, logger))
+		logger.Debug("SQS Publisher added.")
 	}
 	if timestreamTable := conf.GetAsDuration("aws.timestream.table", nil); timestreamTable != nil {
 		publisher = append(publisher, newTimestreamTarget(conf, logger))
+		logger.Debug("Timestream Publisher added.")
 	}
 	return &SensorDataCollector{
 		schedule:        schedule,
@@ -141,7 +143,9 @@ func (collector *SensorDataCollector) publish(deviceId string, measurementType e
 		Value:     value,
 	}
 	for _, publisher := range collector.publisher {
-		publisher.SendMeasurement(measurement)
+		if err := publisher.SendMeasurement(measurement); err != nil {
+			collector.logger.Error(err)
+		}
 	}
 }
 
