@@ -8,7 +8,7 @@ import (
 )
 
 // NewTimestreamTarget returns a new target which writes measurements to AWS Timestream.
-func newTimestreamTarget(conf config.Config, logger log.Logger) indoorclimate.Publisher {
+func NewTimestreamTarget(conf config.Config, logger log.Logger) indoorclimate.Publisher {
 	return &TimestreamTarget{
 		metricPublisher: metrics.NewTimestreamPublisher(conf, logger),
 	}
