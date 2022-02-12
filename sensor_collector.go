@@ -19,12 +19,17 @@ func NewSensorDataCollector(conf config.Config, logger log.Logger) core.Collecto
 	schedule := conf.GetAsDuration("indoorclimate.schedule", nil)
 	retryCount := conf.GetAsInt("indoorclimate.retry", config.AsIntPtr(3))
 	adapterId := conf.Get("indoorclimate.adapter", config.AsStringPtr("hci0"))
+
 	deviceIds := deviceIdsFromConfig(conf)
 	devices := []SensorDevice{}
 	for _, deviceId := range deviceIds {
 		devices = append(devices, NewIndoorClimateSensor(*adapterId, deviceId))
 	}
+	logger.Debugf("Number of observed devices: %d", len(devices))
+
 	characteristics := characteristicsFromConfig(conf)
+	logger.Debugf("Number of observed characteristics: %d", len(characteristics))
+
 	publisher := []Publisher{newLogPublisher(logger)}
 	if queue := conf.Get("hdb.queue", nil); queue != nil {
 		publisher = append(publisher, NewSqsTarget(conf, logger))
@@ -34,6 +39,7 @@ func NewSensorDataCollector(conf config.Config, logger log.Logger) core.Collecto
 		publisher = append(publisher, newTimestreamTarget(conf, logger))
 		logger.Debug("Timestream Publisher added.")
 	}
+
 	return &SensorDataCollector{
 		schedule:        schedule,
 		logger:          logger,
