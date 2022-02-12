@@ -4,23 +4,12 @@ import (
 	"time"
 
 	btdevice "github.com/muka/go-bluetooth/bluez/profile/device"
-	config "github.com/tommzn/go-config"
 	log "github.com/tommzn/go-log"
 	metrics "github.com/tommzn/go-metrics"
-	secrets "github.com/tommzn/go-secrets"
 	utils "github.com/tommzn/go-utils"
 	core "github.com/tommzn/hdb-datasource-core"
 	events "github.com/tommzn/hdb-events-go"
 )
-
-// MqttClient is used to subsribe to a MQTT broker and process messages with indoor climate data.
-type MqttClient struct {
-	conf            config.Config
-	secretsManager  secrets.SecretsManager
-	logger          log.Logger
-	targets         []MessageTarget
-	metricPublisher metrics.Publisher
-}
 
 // SqsTarget sends passed indoor climate data to a AWS SQS queue.
 type SqsTarget struct {

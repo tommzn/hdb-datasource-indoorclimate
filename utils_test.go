@@ -24,16 +24,6 @@ func (suite *UtilsTestSuite) TestCreateTopics() {
 	suite.Len(topics, 3)
 }
 
-func (suite *UtilsTestSuite) TestMockTestCoverage() {
-
-	mockedMessage := messageForTest()
-	suite.False(mockedMessage.Duplicate())
-	suite.True(mockedMessage.Qos() > 0)
-	suite.False(mockedMessage.Retained())
-	suite.True(mockedMessage.MessageID() > 0)
-	mockedMessage.Ack()
-}
-
 func (suite *UtilsTestSuite) TestExtractDeviceId() {
 
 	suite.Nil(extractDeviceId("xxx"))

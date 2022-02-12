@@ -7,6 +7,7 @@ import (
 	"github.com/muka/go-bluetooth/api"
 )
 
+// NewIndoorClimateSensor returns a new indoor climate device.
 func NewIndoorClimateSensor(adapterId, deviceId string) SensorDevice {
 	return &IndoorClimateSensor{
 		adapterId: adapterId,
