@@ -84,7 +84,12 @@ func (collector *SensorDataCollector) RunContinouous(ctx context.Context) {
 
 	collector.logger.Debugf("Run continuous collection with schedule of: %s", *collector.schedule)
 	for {
+		collector.errorStack = utils.NewErrorStack()
 		collector.RunSingle(ctx)
+		if err := collector.errorStack.AsError(); err != nil {
+			collector.logger.Error(err)
+		}
+		collector.logger.Flush()
 		select {
 		case <-time.After(*collector.schedule):
 			collector.logger.Debug("Restart Data collection")
