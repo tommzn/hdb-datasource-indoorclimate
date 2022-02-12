@@ -11,6 +11,15 @@ import (
 	events "github.com/tommzn/hdb-events-go"
 )
 
+// MeasurementType is a indoor climate date type, e.g. temperature.
+type MeasurementType string
+
+const (
+	MEASUREMENTTYPE_TEMPERATURE MeasurementType = "temperature"
+	MEASUREMENTTYPE_HUMIDITY    MeasurementType = "humidity"
+	MEASUREMENTTYPE_BETTERY     MeasurementType = "battery"
+)
+
 // SqsTarget sends passed indoor climate data to a AWS SQS queue.
 type SqsTarget struct {
 
@@ -50,7 +59,7 @@ type IndoorClimateSensor struct {
 type IndoorClimateMeasurement struct {
 	DeviceId  string
 	Timestamp time.Time
-	Type      events.MeasurementType
+	Type      MeasurementType
 	Value     string
 }
 
@@ -62,7 +71,7 @@ type LogPublisher struct {
 // Characteristic is a songle sensor value.
 type Characteristic struct {
 	uuid            string
-	measurementType events.MeasurementType
+	measurementType MeasurementType
 }
 
 // SensorDataCollector will try to fetch temperature, humidity and bettery status

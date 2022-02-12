@@ -50,6 +50,11 @@ func NewSensorDataCollector(conf config.Config, logger log.Logger) core.Collecto
 	}
 }
 
+// AooendTarget will append passed target to internal publisher list.
+func (collector *SensorDataCollector) AooendTarget(newTarget Publisher) {
+	collector.publisher = append(publisher.publisher, newTarget)
+}
+
 // Run will start collecting sensor data from all defined devices.
 func (collector *SensorDataCollector) Run(ctx context.Context) error {
 

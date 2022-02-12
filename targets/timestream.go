@@ -1,20 +1,21 @@
-package indoorclimate
+package targets
 
 import (
 	config "github.com/tommzn/go-config"
 	log "github.com/tommzn/go-log"
 	metrics "github.com/tommzn/go-metrics"
+	indoorclimate "github.com/tommzn/hdb-datasource-indoorclimate"
 )
 
 // NewTimestreamTarget returns a new target which writes measurements to AWS Timestream.
-func newTimestreamTarget(conf config.Config, logger log.Logger) Publisher {
-	return &timestreamTarget{
+func newTimestreamTarget(conf config.Config, logger log.Logger) indoorclimate.Publisher {
+	return &TimestreamTarget{
 		metricPublisher: metrics.NewTimestreamPublisher(conf, logger),
 	}
 }
 
 // Send given indoor climate data to AWS Timestream.
-func (target *timestreamTarget) SendMeasurement(measurement IndoorClimateMeasurement) error {
+func (target *TimestreamTarget) SendMeasurement(measurement indoorclimate.IndoorClimateMeasurement) error {
 	timesteamMetrics := metrics.Measurement{
 		MetricName: "hdb-datasource-indoorclimate",
 		Tags: []metrics.MeasurementTag{
