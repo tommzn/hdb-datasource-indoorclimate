@@ -26,11 +26,11 @@ func NewSensorDataCollector(conf config.Config, logger log.Logger) core.Collecto
 	}
 	characteristics := characteristicsFromConfig(conf)
 	publisher := []Publisher{newLogPublisher(logger)}
-	if queue := conf.GetAsDuration("hdb.queue", nil); queue != nil {
+	if queue := conf.Get("hdb.queue", nil); queue != nil {
 		publisher = append(publisher, NewSqsTarget(conf, logger))
 		logger.Debug("SQS Publisher added.")
 	}
-	if timestreamTable := conf.GetAsDuration("aws.timestream.table", nil); timestreamTable != nil {
+	if timestreamTable := conf.Get("aws.timestream.table", nil); timestreamTable != nil {
 		publisher = append(publisher, newTimestreamTarget(conf, logger))
 		logger.Debug("Timestream Publisher added.")
 	}
