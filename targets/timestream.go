@@ -16,16 +16,18 @@ func newTimestreamTarget(conf config.Config, logger log.Logger) indoorclimate.Pu
 
 // Send given indoor climate data to AWS Timestream.
 func (target *TimestreamTarget) SendMeasurement(measurement indoorclimate.IndoorClimateMeasurement) error {
+
+	measurementType := toEventType(measurement.Type)
 	timesteamMetrics := metrics.Measurement{
 		MetricName: "hdb-datasource-indoorclimate",
 		Tags: []metrics.MeasurementTag{
 			metrics.MeasurementTag{
 				Name:  "deviceid",
-				Value: measurement.DeviceId,
+				Value: measurementType.String(),
 			},
 			metrics.MeasurementTag{
 				Name:  "type",
-				Value: measurement.Type.String(),
+				Value: measurementType.String(),
 			},
 		},
 		Values: []metrics.MeasurementValue{
@@ -34,7 +36,7 @@ func (target *TimestreamTarget) SendMeasurement(measurement indoorclimate.Indoor
 				Value: 1,
 			},
 			metrics.MeasurementValue{
-				Name:  measurement.Type.String(),
+				Name:  measurementType.String(),
 				Value: measurement.Value,
 			},
 		},

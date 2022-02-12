@@ -8,7 +8,7 @@ require (
 	github.com/tommzn/go-log v1.1.0
 	github.com/tommzn/go-metrics v1.0.1
 	github.com/tommzn/hdb-datasource-core v1.2.2
-	github.com/tommzn/hdb-datasource-indoorclimate v1.5.4
+	github.com/tommzn/hdb-datasource-indoorclimate v1.6.0
 	github.com/tommzn/hdb-events-go v1.0.7
 	google.golang.org/protobuf v1.27.1
 )

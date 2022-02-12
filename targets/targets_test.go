@@ -22,11 +22,11 @@ func (suite *UtilsTestSuite) TestConvertToEvent() {
 	measurement := indoorclimate.IndoorClimateMeasurement{
 		DeviceId:  "Devide01",
 		Timestamp: time.Now(),
-		Type:      events.MeasurementType_TEMPERATURE,
+		Type:      indoorclimate.MEASUREMENTTYPE_TEMPERATURE,
 		Value:     "21.5",
 	}
 	event := toIndoorClimateDate(measurement)
-	suite.Equal(measurement.Type, event.Type)
+	suite.Equal(events.MeasurementType_TEMPERATURE, event.Type)
 	suite.Equal(measurement.Value, event.Value)
 	suite.Equal(measurement.DeviceId, event.DeviceId)
 }
