@@ -1,14 +1,12 @@
 package indoorclimate
 
 import (
-	"fmt"
 	"math/rand"
 	"regexp"
 	"strings"
 	"time"
 
 	config "github.com/tommzn/go-config"
-	events "github.com/tommzn/hdb-events-go"
 )
 
 // extractDeviceId try to extract a device id, a mac address, from given topic.
@@ -79,26 +77,13 @@ func characteristicsFromConfig(conf config.Config) []Characteristic {
 	for _, characteristicConfig := range characteristicsConfig {
 		if uuid, ok := characteristicConfig["uuid"]; ok {
 			if measurementTypeStr, ok := characteristicConfig["type"]; ok {
-				if measurementType, err := toMeasurementType(measurementTypeStr); err == nil {
-					characteristics = append(characteristics,
-						Characteristic{
-							uuid:            uuid,
-							measurementType: *measurementType,
-						})
-				}
-
+				characteristics = append(characteristics,
+					Characteristic{
+						uuid:            uuid,
+						measurementType: MeasurementType(measurementTypeStr),
+					})
 			}
 		}
 	}
 	return characteristics
-}
-
-// toMeasurementType converts passed measurement name to a measurement type.
-func toMeasurementType(measurementType string) (*events.MeasurementType, error) {
-	if val, ok := events.MeasurementType_value[strings.ToUpper(measurementType)]; ok {
-		convertedType := events.MeasurementType(val)
-		return &convertedType, nil
-	} else {
-		return nil, fmt.Errorf("Invalid measurement type value: %s", measurementType)
-	}
 }

@@ -11,9 +11,10 @@ import (
 	log "github.com/tommzn/go-log"
 	utils "github.com/tommzn/go-utils"
 	core "github.com/tommzn/hdb-datasource-core"
-	events "github.com/tommzn/hdb-events-go"
 )
 
+// NewSensorDataCollector creates a new collector.
+// Please note: No publisher tartget will be added. You've to do it by yourself using AppenTarget method.
 func NewSensorDataCollector(conf config.Config, logger log.Logger) core.Collector {
 
 	schedule := conf.GetAsDuration("indoorclimate.schedule", nil)
@@ -25,34 +26,21 @@ func NewSensorDataCollector(conf config.Config, logger log.Logger) core.Collecto
 	for _, deviceId := range deviceIds {
 		devices = append(devices, NewIndoorClimateSensor(*adapterId, deviceId))
 	}
-	logger.Debugf("Number of observed devices: %d", len(devices))
-
 	characteristics := characteristicsFromConfig(conf)
-	logger.Debugf("Number of observed characteristics: %d", len(characteristics))
-
-	publisher := []Publisher{newLogPublisher(logger)}
-	if queue := conf.Get("hdb.queue", nil); queue != nil {
-		publisher = append(publisher, NewSqsTarget(conf, logger))
-		logger.Debug("SQS Publisher added.")
-	}
-	if timestreamTable := conf.Get("aws.timestream.table", nil); timestreamTable != nil {
-		publisher = append(publisher, newTimestreamTarget(conf, logger))
-		logger.Debug("Timestream Publisher added.")
-	}
 
 	return &SensorDataCollector{
 		schedule:        schedule,
 		logger:          logger,
 		devices:         devices,
 		characteristics: characteristics,
-		publisher:       publisher,
+		publisher:       []Publisher{},
 		retryCount:      *retryCount,
 	}
 }
 
 // AooendTarget will append passed target to internal publisher list.
-func (collector *SensorDataCollector) AooendTarget(newTarget Publisher) {
-	collector.publisher = append(publisher.publisher, newTarget)
+func (collector *SensorDataCollector) AppendTarget(newTarget Publisher) {
+	collector.publisher = append(collector.publisher, newTarget)
 }
 
 // Run will start collecting sensor data from all defined devices.
@@ -67,6 +55,7 @@ func (collector *SensorDataCollector) Run(ctx context.Context) error {
 	return collector.errorStack.AsError()
 }
 
+// RunSingle run indoor climate data fetch once for all devices.
 func (collector *SensorDataCollector) RunSingle(ctx context.Context) {
 
 	defer collector.logger.Flush()
@@ -85,6 +74,7 @@ func (collector *SensorDataCollector) RunSingle(ctx context.Context) {
 
 }
 
+// RunContinouous will run in an endless loop and fetches device data in a defines schedule.
 func (collector *SensorDataCollector) RunContinouous(ctx context.Context) {
 
 	collector.logger.Debugf("Run continuous collection with schedule of: %s", *collector.schedule)
@@ -105,9 +95,10 @@ func (collector *SensorDataCollector) RunContinouous(ctx context.Context) {
 	}
 }
 
+// ReadDevciceData reads all defines characteristics from passed device.
 func (collector *SensorDataCollector) readDevciceData(device SensorDevice) {
 
-	defer collector.deviceDataCollectd()
+	defer collector.deviceDataCollected()
 
 	err := device.Connect()
 	if err != nil {
@@ -128,11 +119,12 @@ func (collector *SensorDataCollector) readDevciceData(device SensorDevice) {
 	}
 }
 
+// ReadDevciceCharacteristic will read single characteristic from passed device.
 func (collector *SensorDataCollector) readDevciceCharacteristic(device SensorDevice, characteristic Characteristic) (string, error) {
 
 	for attemps := 0; attemps < collector.retryCount; attemps++ {
 		if val, err := device.ReadValue(characteristic.uuid); err == nil {
-			if characteristic.measurementType == events.MeasurementType_BATTERY {
+			if characteristic.measurementType == MEASUREMENTTYPE_BATTERY {
 				if len(val) < 2 {
 					val = append(val, byte(0))
 				}
@@ -151,7 +143,8 @@ func (collector *SensorDataCollector) readDevciceCharacteristic(device SensorDev
 		characteristic.uuid, device.Id())
 }
 
-func (collector *SensorDataCollector) publish(deviceId string, measurementType events.MeasurementType, value string) {
+// Publish will send passed measurement to all available publishers.
+func (collector *SensorDataCollector) publish(deviceId string, measurementType MeasurementType, value string) {
 	measurement := IndoorClimateMeasurement{
 		DeviceId:  deviceId,
 		Timestamp: time.Now(),
@@ -165,6 +158,7 @@ func (collector *SensorDataCollector) publish(deviceId string, measurementType e
 	}
 }
 
-func (collector *SensorDataCollector) deviceDataCollectd() {
+// DeviceDataCollected will finish indoor climate data collection by writing to internal channel.
+func (collector *SensorDataCollector) deviceDataCollected() {
 	collector.done <- struct{}{}
 }
