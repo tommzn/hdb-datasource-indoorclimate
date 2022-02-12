@@ -10,6 +10,7 @@ import (
 
 	core "github.com/tommzn/hdb-datasource-core"
 	indoorclimate "github.com/tommzn/hdb-datasource-indoorclimate"
+	targets "github.com/tommzn/hdb-datasource-indoorclimate/targets"
 )
 
 var configFile string
