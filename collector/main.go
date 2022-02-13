@@ -37,16 +37,14 @@ func bootstrap(ctx context.Context) core.Collector {
 	conf := loadConfig()
 	logger := newLogger(conf, secretsManager, ctx)
 	datacollector := indoorclimate.NewSensorDataCollector(conf, logger)
-	collector := core.NewContinuousCollector(datacollector, logger)
-
 	if queue := conf.Get("hdb.queue", nil); queue != nil {
-		collector.(*indoorclimate.SensorDataCollector).AppendTarget(targets.NewSqsTarget(conf, logger))
+		datacollector.(*indoorclimate.SensorDataCollector).AppendTarget(targets.NewSqsTarget(conf, logger))
 	}
 	if timestreamTable := conf.Get("aws.timestream.table", nil); timestreamTable != nil {
-		collector.(*indoorclimate.SensorDataCollector).AppendTarget(targets.NewTimestreamTarget(conf, logger))
+		datacollector.(*indoorclimate.SensorDataCollector).AppendTarget(targets.NewTimestreamTarget(conf, logger))
 	}
-	collector.(*indoorclimate.SensorDataCollector).AppendTarget(targets.NewLogTarget(logger))
-	return collector
+	datacollector.(*indoorclimate.SensorDataCollector).AppendTarget(targets.NewLogTarget(logger))
+	return core.NewContinuousCollector(datacollector, logger)
 }
 
 // loadConfig from config file.
