@@ -43,7 +43,6 @@ func bootstrap(ctx context.Context) core.Collector {
 	if timestreamTable := conf.Get("aws.timestream.table", nil); timestreamTable != nil {
 		datacollector.(*indoorclimate.SensorDataCollector).AppendTarget(targets.NewTimestreamTarget(conf, logger))
 	}
-	datacollector.(*indoorclimate.SensorDataCollector).AppendTarget(targets.NewLogTarget(logger))
 	return core.NewContinuousCollector(datacollector, logger)
 }
 
