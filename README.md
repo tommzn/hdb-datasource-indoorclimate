@@ -5,7 +5,7 @@
 [![Actions Status](https://github.com/tommzn/hdb-datasource-indoorclimate/actions/workflows/go.pkg.auto-ci.yml/badge.svg)](https://github.com/tommzn/hdb-datasource-indoorclimate/actions)
 
 # HomeDashboard Indoor Climate DataSource
-Fetches indoor climate data from Bluetooth sensor devices, e.g. Xiaomi Mi Temperature and Humidity Monitor 2, and publishes this data to a AWS SQS queue for futher processing.
+Fetches indoor climate data from Bluetooth sensor devices, e.g. Xiaomi Mi Temperature and Humidity Monitor 2, and publishes this data to specified targets.
 
 ## Define Devices and Characteristics
 You've to add a list of devices and characteristics you want to observe in config.
@@ -32,30 +32,7 @@ Provide a list of MAC addesses for Bluetooth environment sensors.
 Define a list of observed characteristics by their UUID and specifiy a indoor cliamte data type.
 
 ## Targets
-In addition to a default log target, a SQS publisher target or a AWS Timestream target will be added automatically if correcponding config is set.
-
-### Log Publisher
-Default target, will be added all time and writes indoor climate measurements with log level debug. See [Log](https://github.com/tommzn/go-log) for more details about used logger.
-
-### AWS SQS Publisher
-This target will send indoor climate measurements to a AWS SQS queue if one has been defined in config as followed.
-```yaml
-hdb:
-  queue: sqs-queue
-```
-See [Metrics](https://github.com/tommzn/go-metrics) for ore details about timesteam integration.
-
-### AWS Timestream Publisher
-To collect indoor climate data in a timestream database (AWS Timestream) you can provide a timestream config and a correcponding publisher will be added.
-```yaml
-aws:
-  timestream:
-    region: eu-west-1
-    database: timestreamdb
-    table: timestreamtable
-    batch_size: 10
-```
-<strong>Note: In addition to this config you've to provide AWS access keys with correct permissions.</strong>
+By default a SensorDataCollector doesn't have any target assign. This means your indoor climate date get lost. [Targets](https://github.com/tommzn/hdb-datasource-indoorclimate/tree/main/targets) package provides different publishers you can assign to a SensorDataCollector to send indoor climate data to a target.
 
 ## Usage
 After creating a new collector you can call it's Run method to start consuming new indoor climate data from MQTT broker. By default all received indoor climate data are send
@@ -63,22 +40,31 @@ to default target which is a logger, only. Collector will run until you cancel p
 ```golang
 
     import (
+      "fmt"
+      "context"
+
        indoorclimate "github.com/tommzn/hdb-datasource-indoorclimate"  
+       targets "github.com/tommzn/hdb-datasource-indoorclimate(targets"  
        config "github.com/tommzn/go-config"
 	     log "github.com/tommzn/go-log"
-	     secrets "github.com/tommzn/go-secrets"
     )
     
-    collector, err := indoorclimate.New(conf, logger, secretsmanager)
+    conf, _ := config.NewConfigSource().Load()
+    if err != nil {
+        panic(err)
+    }
+    logger := log.NewLoggerFromConfig(conf, nil)
+
+    datacollector := indoorclimate.NewSensorDataCollector(conf, logger)
     if err != nil {
         panic(err)
     }
 
-    ctx, cancelFunc := context.WithCancel(context.Background())
-    err := collector.Run(ctx)
-    if err != nil {
-        panic(err)
+    datacollector.AppendTarget(targets.NewStdoutTarget())
+    if err := datacollector.Run(context.Background()); err != nil {
+      fmt.Println)err  
     }
+    
 ```
 
 # Links

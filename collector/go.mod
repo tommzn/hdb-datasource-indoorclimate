@@ -1,4 +1,4 @@
-module github.com/tommzn/hdb-datasource-indoorclimate/bin
+module github.com/tommzn/hdb-datasource-indoorclimate/collector
 
 go 1.17
 

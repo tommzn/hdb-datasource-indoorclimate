@@ -1,3 +1,4 @@
+// Package contains provides diferent targets Indoor Climate date can be send to.
 package targets
 
 import (
