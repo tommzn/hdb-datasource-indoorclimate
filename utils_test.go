@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/suite"
-	events "github.com/tommzn/hdb-events-go"
 )
 
 type UtilsTestSuite struct {
@@ -68,13 +67,4 @@ func (suite *UtilsTestSuite) TestGetCharacteristicsFromConfig() {
 	suite.Len(characteristics, 3)
 	suite.NotEqual("", characteristics[0].uuid)
 	suite.NotEqual("", characteristics[0].measurementType)
-}
-
-func (suite *UtilsTestSuite) TestConvertMeasurementType() {
-
-	measurementType1 := MeasurementType("battery")
-	suite.Equal(events.MeasurementType_BATTERY, measurementType1.toEventType())
-
-	measurementType2 := MeasurementType("xxx")
-	suite.Equal(events.MeasurementType_TEMPERATURE, measurementType2.toEventType())
 }
