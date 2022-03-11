@@ -1,8 +1,6 @@
 package targets
 
 import (
-	"strings"
-
 	indoorclimate "github.com/tommzn/hdb-datasource-indoorclimate"
 	events "github.com/tommzn/hdb-events-go"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -20,8 +18,15 @@ func toIndoorClimateDate(measurement indoorclimate.IndoorClimateMeasurement) eve
 
 // toEventType returns corresponding measurement type from evnets package.
 func toEventType(measurementType indoorclimate.MeasurementType) events.MeasurementType {
-	if val, ok := events.MeasurementType_value[strings.ToUpper(string(measurementType))]; ok {
-		return events.MeasurementType(val)
+
+	switch measurementType {
+	case indoorclimate.MEASUREMENTTYPE_TEMPERATURE:
+		return events.MeasurementType_TEMPERATURE
+	case indoorclimate.MEASUREMENTTYPE_HUMIDITY:
+		return events.MeasurementType_HUMIDITY
+	case indoorclimate.MEASUREMENTTYPE_BATTERY:
+		return events.MeasurementType_BATTERY
+	default:
+		return events.MeasurementType_TEMPERATURE
 	}
-	return events.MeasurementType_TEMPERATURE
 }
