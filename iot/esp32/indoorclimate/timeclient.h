@@ -15,7 +15,7 @@ public:
   virtual bool begin();
 
   // Get current unix time, seconds since 1970-01-01
-  virtual uint32_t unixtime() = 0;
+  virtual uint32_t unixtime();
 
   // Stop time source, maybe clean up
   virtual void end();
@@ -39,7 +39,7 @@ private:
 class NTP_TimeSource: public TimeSource {
 public:
 
-  NTP_TimeSource();
+  NTP_TimeSource() : ntpClient(ntpUDP, "europe.pool.ntp.org", 0) {};
   virtual ~NTP_TimeSource() {};
   
   virtual bool begin() override;

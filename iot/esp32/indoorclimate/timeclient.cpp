@@ -34,10 +34,6 @@ bool NTP_TimeSource::begin() {
   return true;
 }
 
-NTP_TimeSource::NTP_TimeSource() {
-  ntpClient = NTPClient(ntpUDP, "europe.pool.ntp.org", 0);
-}
-
 uint32_t NTP_TimeSource::unixtime() {
   return ntpClient.getEpochTime();
 }
