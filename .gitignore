@@ -350,5 +350,3 @@ MigrationBackup/
 .ionide/
 
 cover.out
-iot/esp32/indoorclimate/settings.h
-iot/esp32/indoorclimate/wifi_credentials.h
