@@ -8,6 +8,7 @@ public:
   WiFiConnect(char* ssid, char* password, int maxConnectRetries);
   
   bool connect();
+  bool connected();
   void disconnect();
   
 private:

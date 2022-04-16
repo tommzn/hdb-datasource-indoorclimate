@@ -37,6 +37,10 @@ bool WiFiConnect::connect() {
   }
 }
 
+bool WiFiConnect::connected() {
+  return WiFi.status() == WL_CONNECTED;
+}
+
 void WiFiConnect::disconnect() {
   WiFi.disconnect(true);
   WiFi.mode(WIFI_OFF);

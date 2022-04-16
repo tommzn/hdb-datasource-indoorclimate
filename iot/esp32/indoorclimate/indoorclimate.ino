@@ -1,36 +1,33 @@
-/**
- * Inddor climate data collector 
- * 
- *  Collects indoor climate date (temperature, humidity and sensor battery level) from sensor devices.
- *  All indoor climate measurements are published to a MQTT topic on AWS IOT.
- *  
- *  Requires a board with a RTC to get measurement timestamp, e.g. M5Stack Core 2
- *  
- *  @Author tommzn <tommzn@gmx.de>
- *  
- */
 
-// Contains WiFi SSID and passwird
-#include "wifi_credentials.h"
+#include <M5Core2.h>
 
 // Contains AWS IOT devices certificates
 #include "certs.h"
 
-// Contains sleep settings, connection settings and a list of BLE devices
+// Contains WiFi SSID and passwird
+#include "wifi_credentials.h"
+
+// Contains sleep settings and AWS IOT connection settings
 #include "settings.h"
 
-// Config for AW IOT connections
-#include "iot_config.h"
-
-#include "BLEDevice.h"
-#include "BLEIndoorClimate.h"
-#include "IOTIndoorClimatePublisher.h"
+#include "lcd.h"
 #include "WiFiConnect.h"
 #include "WiFiClientSecure.h"
-#include "timeclient.h"
+#include "BLEDevice.h"
+#include "BLEIndoorClimate.h"
+#include "MQTTClient.h"
+#include "ArduinoJson.h"
+#include "base64.hpp"
+#include "timer.h"
 
-// WiFi connection handler, handles connect and disonnect for WiFi networks
-static WiFiConnect wifi = WiFiConnect(WIFI_SSID, WIFI_PASSWORD, MAX_RECONNECT_ATTEMPS);
+// Time Client
+#include <NTPClient.h>
+#include <WiFiUdp.h>
+
+int counter = 0;
+
+// LCD handler for status updates
+static Lcd lcd;
 
 // Secure connection client, used to connect to AWS IOT
 WiFiClientSecure secureClient = WiFiClientSecure();  
@@ -41,85 +38,186 @@ static BLEIndoorClimate indoorClimateCollector = BLEIndoorClimate();
 // List of BLE sensir devices
 static BLEAddress deviceAddresses[] = {BLEAddress("A4:C1:38:0A:26:41")};
 
-// Config for AWS IOT
-IOTConfig iotConfig = IOTConfig(AWS_IOT_THING_NAME, AWS_IOT_ENDPOINT, AWS_IOT_TOPIC, MAX_RECONNECT_ATTEMPS);
+// WiFi connection handler, handles connect and disonnect for WiFi networks
+static WiFiConnect wifi = WiFiConnect(WIFI_SSID, WIFI_PASSWORD, MAX_WIFI_CONNECT_ATTEMPS);
 
-// AWS IOT publisher for collected indoor climate data
-static IOTIndoorClimatePublisher indoorClimatePublisher = IOTIndoorClimatePublisher(secureClient, iotConfig);
+// Indoor climate data publisher
+MQTTClient iotClient = MQTTClient(2048);
+  
+// NTP Setup
+WiFiUDP ntpUDP;
+NTPClient ntp(ntpUDP, "europe.pool.ntp.org", 0);
 
-TimeClient timeclient;
+Timer timer = Timer(&ntp, SECONDS_TO_SLEEP, DISPLAY_TIMEOUT);
 
-/**
- *  CollectIndoorClimate collects and published indoor climate data.
- *  
- *    - Ensure WiFi connection
- *    - Create AWs IOT indoor climate data publisher
- *    - Loop all BLE sensors to get indoor climate data and publish collected measurements to AWS IOT (MQTT Topic)
- *    - Disconnect from AWS IOT and WiFi
- */
 void collectIndoorClimate() {
   
-  if (!wifi.connect()) {   
-    wifi.disconnect(); 
-    return;
-  }
-
-  if (!indoorClimatePublisher.connect()) {   
-    wifi.disconnect(); 
-    return;
-  }
+  uint8_t device_count = sizeof(deviceAddresses) / sizeof(deviceAddresses[0]);
+  uint8_t devices_ok = 0;
+  lcd.initBleDeviceCount();
+  lcd.updateBleDeviceCount(devices_ok, device_count);
   
   for (BLEAddress deviceAddress : deviceAddresses) {
 
+    lcd.initBleDevice(deviceAddress.toString().data());
+    lcd.updateBleDeviceStatus("Connecting");
+    lcd.initBleCharacteristics();
+    
     if (indoorClimateCollector.connect(deviceAddress)) {
 
-      uint32_t timestamp = timeclient.unixtime();
-      indoorClimatePublisher.publishBatteryLevel(deviceAddress.toString().data(), indoorClimateCollector.getBatteryLevel(), timestamp);
-      indoorClimatePublisher.publishTemperature(deviceAddress.toString().data(), indoorClimateCollector.getTemperature(), timestamp);
-      indoorClimatePublisher.publishHumidity(deviceAddress.toString().data(), indoorClimateCollector.getHumidity(), timestamp);  
-
+      lcd.updateBleDeviceStatus("Connected");
+      
+      unsigned long timestamp = ntp.getEpochTime();
+      lcd.updateBatteryStatus("Fetching");
+      const char* battery_level = indoorClimateCollector.getBatteryLevel().c_str();
+      lcd.updateBatteryStatus("OK");
+      publishMeasurement(deviceAddress.toString().data(), battery_level, "battery", timestamp);  
+      lcd.updateBatteryStatus("Published");
+      
+      lcd.updateTemperatureStatus("Fetching");
+      const char* temperature = indoorClimateCollector.getTemperature().c_str();
+      lcd.updateTemperatureStatus("OK");
+      publishMeasurement(deviceAddress.toString().data(), temperature, "temperature", timestamp);  
+      lcd.updateTemperatureStatus("Published");
+      
+      lcd.updateHumidityStatus("Fetching");
+      const char* humidity = indoorClimateCollector.getHumidity().c_str();
+      lcd.updateHumidityStatus("OK");
+      publishMeasurement(deviceAddress.toString().data(), humidity, "humidity", timestamp);  
+      lcd.updateHumidityStatus("Published");
+      
       indoorClimateCollector.disconnect();  
+      lcd.updateBleDeviceStatus("Disonnected");
+      devices_ok++;
+      lcd.updateBleDeviceCount(devices_ok, device_count);
+
+    } else {
+      lcd.updateBleDeviceStatus("Failed");
+      lcd.updateTemperatureStatus("Failed");
+      lcd.updateBatteryStatus("Failed");
+      lcd.updateHumidityStatus("Failed");
     }
   }
-
-  indoorClimatePublisher.disconnect();
-  wifi.disconnect(); 
 }
 
-/**
- *  Setup
- *    - Init Serial monitor and BLE 
- *    - Assign AWS IOT certificates to secure client
- *    - Set deep sleep timer
- */
-void setup() {
-  
-  Serial.begin(115200);
+void publishMeasurement(const char* address, std::string value, const char* characteristic, unsigned long timestamp) {
 
-  // Init BLE device
+  unsigned char base64[10];
+  unsigned int base64_length = encode_base64((unsigned char *) value.c_str(), strlen(value.c_str()), base64);
+  
+  StaticJsonDocument<200> doc;
+  doc["device_id"]      = address;
+  doc["characteristic"] = characteristic;
+  doc["value"]          = base64;
+  doc["timestamp"]      = timestamp;
+  
+  char jsonBuffer[512];
+  serializeJson(doc, jsonBuffer);
+
+  iotClient.publish(AWS_IOT_TOPIC, jsonBuffer);
+}
+
+
+bool connectToWifi() {
+  lcd.updatetWifiStatus("Connecting");
+  bool connected = wifi.connect();
+  showWiFiStatus();
+  return connected;
+}
+
+void connectToAwsIot() {
+  
+  lcd.updatetAwsIotStatus("Connecting");
+  int retries = 0;
+  while (!iotClient.connect(AWS_IOT_THING_NAME) && retries < MAX_AWSIOT_CONNECT_ATTEMPS) {
+    Serial.print(".");
+    retries++;
+    delay(500);
+  }
+  showAwsIotStatus();
+}
+
+void showWiFiStatus() {
+  if (wifi.connect()) {
+    lcd.updatetWifiStatus("Connected");
+  } else {
+    lcd.updatetWifiStatus("Failed");
+  }
+}
+
+void showAwsIotStatus() {
+  if (iotClient.connected()) {
+    lcd.updatetAwsIotStatus("Connected");
+  } else {
+    lcd.updatetAwsIotStatus("Failed");
+  }
+}
+
+void setup() {
+
+  M5.begin();
   BLEDevice::init("");
+  Serial.begin(115200);
+  
+  counter = 0;
+  Lcd.initLoopCounter();
+  Lcd.updateLoopCounter(counter);
+  
+  Lcd.initWifiStatus();
+  lcd.updatetWifiStatus("Disconnected");
+
+  lcd.initAwsIotStatus();
+  lcd.updatetAwsIotStatus("Disconnected");
 
   // Configure WiFiClientSecure to use the AWS IoT device credentials
   secureClient.setCACert(AWS_CERT_CA);
   secureClient.setCertificate(AWS_CERT_CRT);
   secureClient.setPrivateKey(AWS_CERT_PRIVATE);
 
-  esp_sleep_enable_timer_wakeup(SECONDS_TO_SLEEP * uS_TO_S_FACTOR);
-  
+  if (connectToWifi()) {
+    iotClient.begin(AWS_IOT_ENDPOINT, 8883, secureClient);
+    iotClient.setKeepAlive(60);
+    connectToAwsIot();
+
+    // Update current time for measurment timestamp
+    ntp.begin();
+    ntp.update();
+  }
 }
 
-/**
- *  At each execution current time will be updated via NTP, indoor climate data 
- *  is collected from all defined devices and is published to a MQTT topic in AWs IOT.
- */
 void loop() {
 
-  timeclient.begin();
-  
-  collectIndoorClimate(); 
+  counter++;
+  Lcd.updateLoopCounter(counter);
 
-  timeclient.end();
+  // In case any connection get lost restart
+  if (!wifi.connected() || !iotClient.connected()) { 
+      showWiFiStatus();
+      showAwsIotStatus();
+      delay(5000);
+      M5.shutdown(3);  
+  }  
+    
+  if (timer.isExecTimerExpired()) {
+
+    timer.initExecTimer();
+
+    lcd.wakeup();    
+    delay(500);
+    
+    // Collect indoor climate date from all defined sensors
+    collectIndoorClimate();
+
+    timer.initDisplayTimer();
+  }
+
+  if (timer.isDisplayTimerActive() && timer.isDisplayTimerExpired()) {
+    timer.disableDisplayTimer();
+    lcd.sleep();
+  }
   
+  iotClient.loop();
   Serial.flush(); 
-  esp_deep_sleep_start();
+  delay(1000);
+  
 }
