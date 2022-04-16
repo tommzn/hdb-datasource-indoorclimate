@@ -1,70 +1,26 @@
+# Use the latest 2.1 version of CircleCI pipeline process engine.
+# See: https://circleci.com/docs/2.0/configuration-reference
 version: 2.1
 
-orbs:
-  aws-ecr: circleci/aws-ecr@7.3.0
-  aws-cli: circleci/aws-cli@2.1.0
-
+# Define a job to be invoked later in a workflow.
+# See: https://circleci.com/docs/2.0/configuration-reference/#jobs
 jobs:
-  go-build:
+  say-hello:
+    # Specify the execution environment. You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
+    # See: https://circleci.com/docs/2.0/configuration-reference/#docker-machine-macos-windows-executor
     docker:
-      - image: circleci/golang:1.17
+      - image: cimg/base:stable
+    # Add steps to the job
+    # See: https://circleci.com/docs/2.0/configuration-reference/#steps
     steps:
       - checkout
       - run:
-          name: Run tests
-          command: go test -v  -covermode=count ./...
-          working_directory: lambda
-      - run:
-          name: Build Binary
-          command: CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -v -o build_artifact_bin
-          working_directory: lambda
-      - persist_to_workspace:
-          root: .
-          paths:
-            - lambda/build_artifact_bin
-  ecr-build-and-deploy:
-    executor: aws-ecr/default
-    steps:
-      - checkout
-      - attach_workspace:
-          at: .
-      - aws-ecr/build-and-push-image:
-          repo: $AWS_ECR_REPOSITORY
-          tag: "${CIRCLE_SHA1},latest"
-          path: lambda
-          checkout: false
-  lambda-func-update:
-    executor: aws-cli/default
-    steps:
-      - aws-cli/setup
-      - run: 
-          name: Update Lambda Function Image
-          command: aws lambda update-function-code --region $AWS_REGION --function-name $AWS_LAMBDA_FUNCTION --image-uri ${AWS_ECR_ACCOUNT_URL}/${AWS_ECR_REPOSITORY}:latest
+          name: "Say hello"
+          command: "echo Hello, World!"
 
+# Invoke jobs via workflows
+# See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
-  version: 2
-  aws-lambda-deploy:
+  say-hello-workflow:
     jobs:
-      - go-build:
-          filters:
-            tags:
-              only: /^lambda\/v[0-9]+(\.[0-9]+)*$/
-            branches:
-              only: main
-      - ecr-build-and-deploy:
-          filters:
-            tags:
-              only: /^lambda\/v[0-9]+(\.[0-9]+)*$/
-            branches:
-              only: main
-          requires:
-            - go-build
-      - lambda-func-update:
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /^lambda\/v[0-9]+(\.[0-9]+)*$/
-          requires:
-            - ecr-build-and-deploy
-          
+      - say-hello
