@@ -1,6 +1,8 @@
 package main
 
 import (
+	"context"
+
 	"github.com/aws/aws-lambda-go/lambda"
 
 	config "github.com/tommzn/go-config"
@@ -40,7 +42,11 @@ func newSecretsManager() secrets.SecretsManager {
 
 // newLogger creates a new logger from  passed config.
 func newLogger(conf config.Config, secretsMenager secrets.SecretsManager) log.Logger {
-	return log.NewLoggerFromConfig(conf, secretsMenager)
+	logger := log.NewLoggerFromConfig(conf, secretsMenager)
+	logContextValues := make(map[string]string)
+	logContextValues[log.LogCtxNamespace] = "hdb-datasource-indoorclimate"
+	logger.WithContext(log.LogContextWithValues(context.Background(), logContextValues))
+	return logger
 }
 
 func exitOnError(err error) {
