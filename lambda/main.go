@@ -8,31 +8,44 @@ import (
 	config "github.com/tommzn/go-config"
 	log "github.com/tommzn/go-log"
 	secrets "github.com/tommzn/go-secrets"
+	targets "github.com/tommzn/hdb-datasource-indoorclimate/targets"
 )
 
 func main() {
 
-	handler := bootstrap()
+	handler, err := bootstrap()
+	if err != nil {
+		panic(err)
+	}
 	lambda.Start(handler.HandleEvent)
 }
 
-func bootstrap() MessageHandler {
+func bootstrap() (MessageHandler, error) {
 
-	conf := loadConfig()
+	conf, err := loadConfig()
+	if err != nil {
+		return nil, err
+	}
 	secretsManager := newSecretsManager()
 	logger := newLogger(conf, secretsManager)
-	return New(logger, conf)
+	handler := New(logger, conf)
+	if queue := conf.Get("hdb.queue", nil); queue != nil {
+		handler.appendTarget(targets.NewSqsTarget(conf, logger))
+	}
+	if timestreamTable := conf.Get("aws.timestream.table", nil); timestreamTable != nil {
+		handler.appendTarget(targets.NewTimestreamTarget(conf, logger))
+	}
+	return handler, nil
 }
 
 // loadConfig from config file.
-func loadConfig() config.Config {
+func loadConfig() (config.Config, error) {
 
-	configSource, err := config.NewS3ConfigSourceFromEnv()
-	exitOnError(err)
-
-	conf, err := configSource.Load()
-	exitOnError(err)
-	return conf
+	configSource, _ := config.NewS3ConfigSourceFromEnv()
+	if conf, err := configSource.Load(); err == nil {
+		return conf, err
+	}
+	return config.NewFileConfigSource(nil).Load()
 }
 
 // newSecretsManager retruns a new secrets manager from passed config.
@@ -47,10 +60,4 @@ func newLogger(conf config.Config, secretsMenager secrets.SecretsManager) log.Lo
 	logContextValues[log.LogCtxNamespace] = "hdb-datasource-indoorclimate"
 	logger.WithContext(log.LogContextWithValues(context.Background(), logContextValues))
 	return logger
-}
-
-func exitOnError(err error) {
-	if err != nil {
-		panic(err)
-	}
 }

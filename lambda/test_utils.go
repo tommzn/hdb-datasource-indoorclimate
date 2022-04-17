@@ -5,7 +5,6 @@ import (
 
 	config "github.com/tommzn/go-config"
 	log "github.com/tommzn/go-log"
-	secrets "github.com/tommzn/go-secrets"
 )
 
 // loadConfigForTest loads test config.
@@ -20,21 +19,34 @@ func loadConfigForTest(fileName *string) config.Config {
 	return config
 }
 
-// secretsManagerForTest returns a default secrets manager for testing
-func secretsManagerForTest() secrets.SecretsManager {
-	return secrets.NewSecretsManager()
-}
-
 // loggerForTest creates a new stdout logger for testing.
 func loggerForTest() log.Logger {
 	return log.NewLogger(log.Debug, nil, nil)
 }
 
-func indoorClimateDateForTest() IndoorClimateDate {
-	return IndoorClimateDate{
+func indoorClimateDataForTest() IndoorClimateData {
+	return IndoorClimateData{
 		DeviceId:       "XYZ",
-		Characteristic: "temp",
+		Characteristic: "temperature",
 		TimeStamp:      time.Now().Unix(),
 		Value:          "Fgg=",
+	}
+}
+
+func invalidIndoorClimateDataForTest() IndoorClimateData {
+	return IndoorClimateData{
+		DeviceId:       "XYZ",
+		Characteristic: "temperature",
+		TimeStamp:      time.Now().Unix(),
+		Value:          "+&/(",
+	}
+}
+
+func batteryDataForTest() IndoorClimateData {
+	return IndoorClimateData{
+		DeviceId:       "XYZ",
+		Characteristic: "battery",
+		TimeStamp:      time.Now().Unix(),
+		Value:          "Og==",
 	}
 }
