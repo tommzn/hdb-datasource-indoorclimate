@@ -16,16 +16,6 @@ void Lcd::sleep() {
 void Lcd::wakeup() {
   M5.Lcd.wakeup();
 }
-    
-void Lcd::initLoopCounter() {
-    initLine(line_number_loop, "Loop");
-}
-
-void Lcd::updateLoopCounter(uint16_t counter) {
-    char buf[10];
-    sprintf(buf, "%d", counter);
-    writeValue(line_number_loop, buf); 
-}
 
 void Lcd::initWifiStatus() {
     initLine(line_number_wifi, "WiFi");
@@ -104,6 +94,11 @@ void Lcd::writeValue(uint8_t line_number, const char* value) {
     M5.Lcd.print(value);
 } 
 
-
+void Lcd::updateBatteryLevel(uint8_t battery_level) {
+    uint8_t width = 50;
+    M5.Lcd.fillRect(M5.Lcd.width() - width, top_margin + line_height * line_number_bat_level, width, line_height, BLACK);
+    M5.Lcd.setCursor(M5.Lcd.width() - width, top_margin + line_height * line_number_bat_level);
+    M5.Lcd.printf("%d%%", battery_level);
+}
     
     

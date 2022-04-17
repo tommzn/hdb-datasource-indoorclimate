@@ -6,9 +6,6 @@ public:
     void sleep();
     void wakeup();
     
-    void initLoopCounter();
-    void updateLoopCounter(uint16_t counter);
-
     void initWifiStatus();
     void updatetWifiStatus(const char* wifi_status);
 
@@ -26,6 +23,8 @@ public:
     void updateHumidityStatus(const char* status);
     void updateBatteryStatus(const char* status);
 
+    void updateBatteryLevel(uint8_t battery_level);
+
 private:
 
     void initLine(uint8_t line_number, const char* title);
@@ -40,15 +39,15 @@ private:
     uint8_t separator_pos_x = 100;
     uint8_t status_pos_x    = 115;
 
-    uint8_t line_number_loop    = 0;
-    uint8_t line_number_wifi    = 1;
-    uint8_t line_number_awsiot  = 2;
-    uint8_t line_number_blecnt  = 3;
+    uint8_t line_number_wifi    = 0;
+    uint8_t line_number_awsiot  = 1;
+    uint8_t line_number_blecnt  = 2;
 
-    uint8_t line_number_bledevice   = 5;
-    uint8_t line_number_blestatus   = 6;
-    uint8_t line_number_charc_temp  = 7;
-    uint8_t line_number_charc_hum   = 8;
-    uint8_t line_number_charc_bat   = 9;
+    uint8_t line_number_bledevice   = 4;
+    uint8_t line_number_blestatus   = 5;
+    uint8_t line_number_charc_temp  = 6;
+    uint8_t line_number_charc_hum   = 7;
+    uint8_t line_number_charc_bat   = 8;
+    uint8_t line_number_bat_level   = 9;
     
 };
