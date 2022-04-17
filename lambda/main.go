@@ -41,10 +41,12 @@ func bootstrap() (MessageHandler, error) {
 // loadConfig from config file.
 func loadConfig() (config.Config, error) {
 
-	configSource, _ := config.NewS3ConfigSourceFromEnv()
-	if conf, err := configSource.Load(); err == nil {
-		return conf, err
+	if configSource, err := config.NewS3ConfigSourceFromEnv(); err == nil && configSource != nil {
+		if conf, err := configSource.Load(); err == nil {
+			return conf, err
+		}
 	}
+	// Fallback to local config file
 	return config.NewFileConfigSource(nil).Load()
 }
 
