@@ -17,6 +17,8 @@ func New(logger log.Logger, conf config.Config) MessageHandler {
 
 func (handler *IotMessageHandler) HandleEvent(ctx context.Context, indoorClimateDate IndoorClimateDate) error {
 
+	defer handler.logger.Flush()
+
 	decodedValue, err := b64.StdEncoding.DecodeString(indoorClimateDate.Value)
 	if err != nil {
 		handler.logger.Error("Unable to decode measurement value, reason: ", err)
