@@ -1,0 +1,64 @@
+Parameters:
+  ThingName:
+    Description: Name of a IOT device.
+    Type: String
+  Topic:
+    Description: MQTT Topic indoor climate data should be send to.
+    Type: String
+  LambdaFunctionArn:
+    Description: Function Arn of event processor.
+    Type: String
+  
+Resources:
+  IotDevice:
+    Type: AWS::IoT::Thing
+    Properties: 
+      ThingName: !Ref "ThingName"
+  IotPolicy:
+    Type: AWS::IoT::Policy
+    Properties: 
+      PolicyName: !Join 
+        - ''
+        - - !Ref "ThingName"
+          - "_Policy" 
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - iot:Connect
+            Resource: 
+              - !Join 
+                - ''
+                - - "arn:aws:iot:"
+                  - !Ref "AWS::Region"
+                  - ":"
+                  - !Ref "AWS::AccountId"
+                  - ":client/"
+                  - !Ref ThingName
+          - Effect: Allow
+            Action:
+              - iot:Publish
+            Resource: 
+              - !Join 
+                - ''
+                - - "arn:aws:iot:"
+                  - !Ref "AWS::Region"
+                  - ":"
+                  - !Ref "AWS::AccountId"
+                  - ":topic/"
+                  - !Ref Topic
+  IotTopicRule:
+    Type: AWS::IoT::TopicRule
+    Properties:
+      RuleName: LambdaForwarder
+      TopicRulePayload:
+        RuleDisabled: false
+        Sql: !Join 
+        - ''
+        - - "SELECT * FROM '"
+          - !Ref Topic
+          - "'"
+        Actions:
+          - Lambda:
+              FunctionArn: !Ref LambdaFunctionArn
