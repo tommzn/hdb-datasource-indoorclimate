@@ -1,4 +1,13 @@
-
+/**
+ *  Indoor Climate Data Collector
+ *  
+ *    Collects temperature, humidity and battery level from sensor devices, 
+ *    e.g Xiaomi Mi Temperature & Humidity Sensor 2 and publishes this data to 
+ *    a MQTT topic on AWS IOT.
+ *    It scans sensor data in a defined schedule and uses deep sleep for idle phases.
+ *
+ *    Author: tommzn <tommzn@gmx.de>
+ */
 #include <M5Core2.h>
 
 // Contains AWS IOT devices certificates
@@ -18,13 +27,10 @@
 #include "MQTTClient.h"
 #include "ArduinoJson.h"
 #include "base64.hpp"
-#include "timer.h"
 
 // Time Client
 #include <NTPClient.h>
 #include <WiFiUdp.h>
-
-int counter = 0;
 
 // LCD handler for status updates
 static Lcd lcd;
@@ -48,8 +54,11 @@ MQTTClient iotClient = MQTTClient(2048);
 WiFiUDP ntpUDP;
 NTPClient ntp(ntpUDP, "europe.pool.ntp.org", 0);
 
-Timer timer = Timer(&ntp, SECONDS_TO_SLEEP, DISPLAY_TIMEOUT);
-
+/**
+ *  Loops all defined sensor devices, connects to, collect all measurements
+ *  and publishes this data as JSON to a topic on AWS IOT.
+ *  In some cases Xiaomi Mi sensors doesn't advertise it's data, so a direct connection is required.
+ */
 void collectIndoorClimate() {
   
   uint8_t device_count = sizeof(deviceAddresses) / sizeof(deviceAddresses[0]);
@@ -100,6 +109,10 @@ void collectIndoorClimate() {
   }
 }
 
+/**
+ *  Convert passed measurment to a JSON object, measurement values will be base64 encoded, and publish
+ *  this data to a MQTT topic on AWS IOT.
+ */
 void publishMeasurement(const char* address, std::string value, const char* characteristic, unsigned long timestamp) {
 
   unsigned char base64[10];
@@ -117,14 +130,24 @@ void publishMeasurement(const char* address, std::string value, const char* char
   iotClient.publish(AWS_IOT_TOPIC, jsonBuffer);
 }
 
-
+/**
+ *  Connect to local WiFi networks and update connection status on LCD.
+ */
 bool connectToWifi() {
   lcd.updatetWifiStatus("Connecting");
-  bool connected = wifi.connect();
-  showWiFiStatus();
-  return connected;
+  if (wifi.connect()) {
+    lcd.updatetWifiStatus("Connected");
+    return true;
+  } else {
+    lcd.updatetWifiStatus("Failed");
+    return false;
+  }
 }
 
+/**
+ *  Establishes a connection to AWS IOT to publish measurements
+ *  and update connection status in LCD.
+ */
 void connectToAwsIot() {
   
   lcd.updatetAwsIotStatus("Connecting");
@@ -134,18 +157,6 @@ void connectToAwsIot() {
     retries++;
     delay(500);
   }
-  showAwsIotStatus();
-}
-
-void showWiFiStatus() {
-  if (wifi.connect()) {
-    lcd.updatetWifiStatus("Connected");
-  } else {
-    lcd.updatetWifiStatus("Failed");
-  }
-}
-
-void showAwsIotStatus() {
   if (iotClient.connected()) {
     lcd.updatetAwsIotStatus("Connected");
   } else {
@@ -159,13 +170,10 @@ void setup() {
   BLEDevice::init("");
   Serial.begin(115200);
   
-  counter = 0;
-  Lcd.initLoopCounter();
-  Lcd.updateLoopCounter(counter);
-  
+  // Init WiFi and AWS IOT connection status on LCD.
   Lcd.initWifiStatus();
+  lcd.updateBatteryLevel(uint8_t(M5.Axp.GetBatteryLevel()));
   lcd.updatetWifiStatus("Disconnected");
-
   lcd.initAwsIotStatus();
   lcd.updatetAwsIotStatus("Disconnected");
 
@@ -174,8 +182,12 @@ void setup() {
   secureClient.setCertificate(AWS_CERT_CRT);
   secureClient.setPrivateKey(AWS_CERT_PRIVATE);
 
+  // Connect to WiFi
   if (connectToWifi()) {
+
+    // Connect to AWS IOT
     iotClient.begin(AWS_IOT_ENDPOINT, 8883, secureClient);
+    // Extend default timeout because data collection may take some seconds.
     iotClient.setKeepAlive(60);
     connectToAwsIot();
 
@@ -187,37 +199,31 @@ void setup() {
 
 void loop() {
 
-  counter++;
-  Lcd.updateLoopCounter(counter);
+  // Climate data collection requires active WiFi and AWS IOT connection
+  if (wifi.connected() && iotClient.connected()) { 
 
-  // In case any connection get lost restart
-  if (!wifi.connected() || !iotClient.connected()) { 
-      showWiFiStatus();
-      showAwsIotStatus();
-      delay(5000);
-      M5.shutdown(3);  
+      // Collect indoor climate date from all defined sensors
+      collectIndoorClimate();
   }  
-    
-  if (timer.isExecTimerExpired()) {
-
-    timer.initExecTimer();
-
-    lcd.wakeup();    
-    delay(500);
-    
-    // Collect indoor climate date from all defined sensors
-    collectIndoorClimate();
-
-    timer.initDisplayTimer();
-  }
-
-  if (timer.isDisplayTimerActive() && timer.isDisplayTimerExpired()) {
-    timer.disableDisplayTimer();
-    lcd.sleep();
-  }
-  
+  // run MQTT client to handle send/receive packages
   iotClient.loop();
+
+  // Shutdown NTP client
+  ntp.end();  
+
+  // Disconnect from AWs IOT and update connection status on LCD
+  iotClient.disconnect();
+  lcd.updatetAwsIotStatus("Disconnected");
+  
+  // Disconnect from WiFi and update connection status on LCD
+  wifi.disconnect();
+  lcd.updatetWifiStatus("Disconnected");
+  
+  // Some delay, to provide to opportunity to read all this information in LCD
+  delay(DISPLAY_TIMEOUT * mS_TO_S_FACTOR);
+
+  // Going to deep sleep until next interation
   Serial.flush(); 
-  delay(1000);
+  M5.Axp.DeepSleep(SECONDS_TO_SLEEP * uS_TO_S_FACTOR);
   
 }
