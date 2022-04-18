@@ -23,7 +23,7 @@ func (target *TimestreamTarget) SendMeasurement(measurement indoorclimate.Indoor
 		Tags: []metrics.MeasurementTag{
 			metrics.MeasurementTag{
 				Name:  "deviceid",
-				Value: measurementType.String(),
+				Value: measurement.DeviceId,
 			},
 			metrics.MeasurementTag{
 				Name:  "type",
@@ -37,7 +37,7 @@ func (target *TimestreamTarget) SendMeasurement(measurement indoorclimate.Indoor
 			},
 			metrics.MeasurementValue{
 				Name:  measurementType.String(),
-				Value: measurement.Value,
+				Value: parseMeasurementValue(measurement.Value),
 			},
 		},
 	}

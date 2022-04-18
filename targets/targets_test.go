@@ -30,3 +30,21 @@ func (suite *UtilsTestSuite) TestConvertToEvent() {
 	suite.Equal(measurement.Value, event.Value)
 	suite.Equal(measurement.DeviceId, event.DeviceId)
 }
+
+func (suite *UtilsTestSuite) TestParseMeasurementValue() {
+
+	val1 := parseMeasurementValue("4.5")
+	floatVal, ok := val1.(float64)
+	suite.True(ok)
+	suite.Equal(4.5, floatVal)
+
+	val2 := parseMeasurementValue("82")
+	intVal, ok := val2.(int)
+	suite.True(ok)
+	suite.Equal(82, intVal)
+
+	val3 := parseMeasurementValue("xxx")
+	stringVal, ok := val3.(string)
+	suite.True(ok)
+	suite.Equal("xxx", stringVal)
+}
