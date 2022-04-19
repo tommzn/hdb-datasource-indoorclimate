@@ -65,6 +65,11 @@ void collectIndoorClimate() {
   uint8_t devices_ok = 0;
   lcd.initBleDeviceCount();
   lcd.updateBleDeviceCount(devices_ok, device_count);
+
+  // Publish own battery level
+  char buf[10];
+  sprintf(buf, "%d", uint8_t(M5.Axp.GetBatteryLevel()));
+  publishMeasurement(wifi.getMacAddress().c_str(), buf, "battery", ntp.getEpochTime());  
   
   for (BLEAddress deviceAddress : deviceAddresses) {
 

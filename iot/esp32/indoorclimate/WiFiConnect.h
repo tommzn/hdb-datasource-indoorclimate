@@ -11,6 +11,8 @@ public:
   bool connected();
   void disconnect();
   
+  String getMacAddress();
+
 private:
 
   int m_connect_retries;

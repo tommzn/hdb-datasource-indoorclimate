@@ -46,3 +46,7 @@ void WiFiConnect::disconnect() {
   WiFi.mode(WIFI_OFF);
   Serial.print("WiFi disconnected!");
 }
+
+String WiFiConnect::getMacAddress() {
+  return WiFi.macAddress();
+}
