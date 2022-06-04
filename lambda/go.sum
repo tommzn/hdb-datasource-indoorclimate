@@ -466,6 +466,8 @@ github.com/tommzn/hdb-datasource-indoorclimate/targets v1.0.3 h1:9v6HQafLpNVVgnM
 github.com/tommzn/hdb-datasource-indoorclimate/targets v1.0.3/go.mod h1:xbWtHVz7oFCiVWwTo6CAw450ZEoyOv09DWeIq9+R/Kk=
 github.com/tommzn/hdb-datasource-indoorclimate/targets v1.0.4 h1:/aZShdP11nFzq1mtW9aUSyhaJYe3S+qwv26gxmeWqQ4=
 github.com/tommzn/hdb-datasource-indoorclimate/targets v1.0.4/go.mod h1:xbWtHVz7oFCiVWwTo6CAw450ZEoyOv09DWeIq9+R/Kk=
+github.com/tommzn/hdb-datasource-indoorclimate/targets v1.0.5 h1:JXzeoYgVlRD8ZIJ+bUu4YnmVTeMGCU71Pe0fnbWIfaA=
+github.com/tommzn/hdb-datasource-indoorclimate/targets v1.0.5/go.mod h1:xbWtHVz7oFCiVWwTo6CAw450ZEoyOv09DWeIq9+R/Kk=
 github.com/tommzn/hdb-events-go v1.0.6/go.mod h1:Pi0wRugUxNO81wqM4lFoie1C6oE8zUbq4h4TjSgvBi4=
 github.com/tommzn/hdb-events-go v1.0.8 h1:v1j1+a5+J+Wd8QZIfqvquSPiyGX1AMPIA7hwFwoul7o=
 github.com/tommzn/hdb-events-go v1.0.8/go.mod h1:Pi0wRugUxNO81wqM4lFoie1C6oE8zUbq4h4TjSgvBi4=

@@ -34,7 +34,7 @@ require (
 	github.com/tommzn/go-utils v1.0.2 // indirect
 	github.com/tommzn/hdb-datasource-core v1.2.2 // indirect
 	github.com/tommzn/hdb-datasource-indoorclimate v1.6.2 // indirect
-	github.com/tommzn/hdb-datasource-indoorclimate/targets v1.0.4 // indirect
+	github.com/tommzn/hdb-datasource-indoorclimate/targets v1.0.5 // indirect
 	github.com/tommzn/hdb-events-go v1.0.8 // indirect
 	golang.org/x/sys v0.0.0-20220224120231-95c6836cb0e7 // indirect
 	golang.org/x/text v0.3.7 // indirect
