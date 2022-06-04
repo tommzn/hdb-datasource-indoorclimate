@@ -39,9 +39,9 @@ func (suite *UtilsTestSuite) TestParseMeasurementValue() {
 	suite.Equal(4.5, floatVal)
 
 	val2 := parseMeasurementValue("82")
-	intVal, ok := val2.(int)
+	intVal, ok := val2.(float64)
 	suite.True(ok)
-	suite.Equal(82, intVal)
+	suite.Equal(float64(82), intVal)
 
 	val3 := parseMeasurementValue("xxx")
 	stringVal, ok := val3.(string)
