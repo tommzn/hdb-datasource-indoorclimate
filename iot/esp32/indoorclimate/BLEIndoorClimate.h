@@ -16,6 +16,9 @@
 class BLEIndoorClimate {
 public:
 
+  BLEIndoorClimate()  { delete m_bleClient; };
+  ~BLEIndoorClimate() { delete m_bleClient; };;
+  
   bool connect(BLEAddress address);
   void disconnect();
   

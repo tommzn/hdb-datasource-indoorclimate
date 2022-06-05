@@ -10,12 +10,11 @@
 bool BLEIndoorClimate::connect(BLEAddress address) {
   
   Serial.print("Connecting to device ");
-  Serial.println(address.toString().c_str());  
   if (m_bleClient != nullptr && m_bleClient->isConnected()) {
     Serial.println("Already connected, disconnect first!");
     m_bleClient->disconnect();
   }
-    
+
   m_bleClient = BLEDevice::createClient();
   if (m_bleClient->connect(address)) {
     Serial.println("Success");

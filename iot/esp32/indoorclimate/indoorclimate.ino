@@ -67,20 +67,22 @@ void collectIndoorClimate() {
   lcd.updateBleDeviceCount(devices_ok, device_count);
 
   // Publish own battery level
-  char buf[10];
-  sprintf(buf, "%d", uint8_t(M5.Axp.GetBatteryLevel()));
-  publishMeasurement(wifi.getMacAddress().c_str(), buf, "battery", ntp.getEpochTime());  
+  const char batLevel = (char) uint8_t(M5.Axp.GetBatteryLevel());
+  publishMeasurement(wifi.getMacAddress().c_str(), &batLevel, "battery", ntp.getEpochTime());  
+
   
   for (BLEAddress deviceAddress : deviceAddresses) {
 
     lcd.initBleDevice(deviceAddress.toString().data());
     lcd.updateBleDeviceStatus("Connecting");
     lcd.initBleCharacteristics();
-    
+
+    Serial.println("Connecting...");
     if (indoorClimateCollector.connect(deviceAddress)) {
 
+      Serial.println("Connected!");
       lcd.updateBleDeviceStatus("Connected");
-      
+
       unsigned long timestamp = ntp.getEpochTime();
       lcd.updateBatteryStatus("Fetching");
       const char* battery_level = indoorClimateCollector.getBatteryLevel().c_str();
@@ -132,6 +134,7 @@ void publishMeasurement(const char* address, std::string value, const char* char
   char jsonBuffer[512];
   serializeJson(doc, jsonBuffer);
 
+  Serial.println(jsonBuffer);
   iotClient.publish(AWS_IOT_TOPIC, jsonBuffer);
 }
 
@@ -171,10 +174,11 @@ void connectToAwsIot() {
 
 void setup() {
 
-  M5.begin();
-  BLEDevice::init("");
   Serial.begin(115200);
   
+  M5.begin();
+  BLEDevice::init("");
+    
   // Init WiFi and AWS IOT connection status on LCD.
   Lcd.initWifiStatus();
   lcd.updateBatteryLevel(uint8_t(M5.Axp.GetBatteryLevel()));
