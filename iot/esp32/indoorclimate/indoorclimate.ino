@@ -67,8 +67,8 @@ void collectIndoorClimate() {
   lcd.updateBleDeviceCount(devices_ok, device_count);
 
   // Publish own battery level
-  const char batLevel = (char) M5.Axp.GetBatteryLevel();
-  publishMeasurement(wifi.getMacAddress().c_str(), &batLevel, "battery", ntp.getEpochTime());  
+  const char batLevel = (char) uint8_t(M5.Axp.GetBatteryLevel());
+  publishMeasurement(wifi.getMacAddress().c_str(), std::string(&batLevel, 1), "battery", ntp.getEpochTime());  
 
   
   for (BLEAddress deviceAddress : deviceAddresses) {
@@ -85,21 +85,19 @@ void collectIndoorClimate() {
 
       unsigned long timestamp = ntp.getEpochTime();
       lcd.updateBatteryStatus("Fetching");
-      const char* battery_level = indoorClimateCollector.getBatteryLevel().c_str();
-      Serial.print("battery_level: ");
-      Serial.println(battery_level);
+      std::string battery_level = indoorClimateCollector.getBatteryLevel();
       lcd.updateBatteryStatus("OK");
       publishMeasurement(deviceAddress.toString().data(), battery_level, "battery", timestamp);  
       lcd.updateBatteryStatus("Published");
       
       lcd.updateTemperatureStatus("Fetching");
-      const char* temperature = indoorClimateCollector.getTemperature().c_str();
+      std::string temperature = indoorClimateCollector.getTemperature();
       lcd.updateTemperatureStatus("OK");
       publishMeasurement(deviceAddress.toString().data(), temperature, "temperature", timestamp);  
       lcd.updateTemperatureStatus("Published");
       
       lcd.updateHumidityStatus("Fetching");
-      const char* humidity = indoorClimateCollector.getHumidity().c_str();
+      std::string humidity = indoorClimateCollector.getHumidity();
       lcd.updateHumidityStatus("OK");
       publishMeasurement(deviceAddress.toString().data(), humidity, "humidity", timestamp);  
       lcd.updateHumidityStatus("Published");
@@ -122,10 +120,10 @@ void collectIndoorClimate() {
  *  Convert passed measurment to a JSON object, measurement values will be base64 encoded, and publish
  *  this data to a MQTT topic on AWS IOT.
  */
-void publishMeasurement(const char* address, const char* value, const char* characteristic, unsigned long timestamp) {
+void publishMeasurement(const char* address, std::string value, const char* characteristic, unsigned long timestamp) {
 
   unsigned char base64[10];
-  unsigned int base64_length = encode_base64((unsigned char*) value, strlen(value), base64);
+  unsigned int base64_length = encode_base64((unsigned char*) value.c_str(), strlen(value.c_str()), base64);
   
   StaticJsonDocument<200> doc;
   doc["device_id"]      = address;
@@ -173,6 +171,14 @@ void connectToAwsIot() {
   }
 }
 
+void processMQTT() {
+
+  unsigned long endAt = millis() + 1000;
+  while (endAt > millis()) {
+    iotClient.loop();
+  }
+}
+
 void setup() {
 
   Serial.begin(115200);
@@ -216,13 +222,14 @@ void loop() {
       collectIndoorClimate();
   }  
   // run MQTT client to handle send/receive packages
-  iotClient.loop();
-
+  processMQTT();
+  
   // Shutdown NTP client
   ntp.end();  
 
   // Disconnect from AWs IOT and update connection status on LCD
   iotClient.disconnect();
+  delay(500);
   lcd.updatetAwsIotStatus("Disconnected");
   
   // Disconnect from WiFi and update connection status on LCD
