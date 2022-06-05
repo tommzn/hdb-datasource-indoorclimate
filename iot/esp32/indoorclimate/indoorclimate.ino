@@ -67,7 +67,7 @@ void collectIndoorClimate() {
   lcd.updateBleDeviceCount(devices_ok, device_count);
 
   // Publish own battery level
-  const char batLevel = (char) uint8_t(M5.Axp.GetBatteryLevel());
+  const char batLevel = (char) M5.Axp.GetBatteryLevel();
   publishMeasurement(wifi.getMacAddress().c_str(), &batLevel, "battery", ntp.getEpochTime());  
 
   
@@ -86,6 +86,8 @@ void collectIndoorClimate() {
       unsigned long timestamp = ntp.getEpochTime();
       lcd.updateBatteryStatus("Fetching");
       const char* battery_level = indoorClimateCollector.getBatteryLevel().c_str();
+      Serial.print("battery_level: ");
+      Serial.println(battery_level);
       lcd.updateBatteryStatus("OK");
       publishMeasurement(deviceAddress.toString().data(), battery_level, "battery", timestamp);  
       lcd.updateBatteryStatus("Published");
@@ -120,10 +122,10 @@ void collectIndoorClimate() {
  *  Convert passed measurment to a JSON object, measurement values will be base64 encoded, and publish
  *  this data to a MQTT topic on AWS IOT.
  */
-void publishMeasurement(const char* address, std::string value, const char* characteristic, unsigned long timestamp) {
+void publishMeasurement(const char* address, const char* value, const char* characteristic, unsigned long timestamp) {
 
   unsigned char base64[10];
-  unsigned int base64_length = encode_base64((unsigned char *) value.c_str(), strlen(value.c_str()), base64);
+  unsigned int base64_length = encode_base64((unsigned char*) value, strlen(value), base64);
   
   StaticJsonDocument<200> doc;
   doc["device_id"]      = address;
@@ -134,7 +136,6 @@ void publishMeasurement(const char* address, std::string value, const char* char
   char jsonBuffer[512];
   serializeJson(doc, jsonBuffer);
 
-  Serial.println(jsonBuffer);
   iotClient.publish(AWS_IOT_TOPIC, jsonBuffer);
 }
 
