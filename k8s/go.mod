@@ -7,7 +7,7 @@ require (
 	github.com/tommzn/go-log v1.2.2
 	github.com/tommzn/go-secrets v1.1.1
 	github.com/tommzn/hdb-datasource-core v1.2.2
-	github.com/tommzn/hdb-datasource-indoorclimate v1.6.7
+	github.com/tommzn/hdb-datasource-indoorclimate v1.6.8
 	github.com/tommzn/hdb-datasource-indoorclimate/plugins v1.0.2 // indirect
 	github.com/tommzn/hdb-datasource-indoorclimate/targets v1.0.6 // indirect
 )
