@@ -26,6 +26,8 @@ func NewMqttCollector(conf config.Config, logger log.Logger) *MqttCollector {
 // Run start indoor climate collector. It's an infinite loop until given context is canceled.
 func (collector *MqttCollector) Run(ctx context.Context) error {
 
+	defer collector.logger.Flush()
+
 	client, connectError := collector.mqttConnect()
 	if connectError != nil {
 		collector.logger.Error("Unable to connect to MQTT broker, reason: ", connectError)
@@ -60,6 +62,7 @@ func (collector *MqttCollector) subscribe(client mqtt.Client, ctx context.Contex
 					collector.logger.Error(err)
 				}
 			}
+			collector.logger.Flush()
 		case <-ctx.Done():
 			collector.logger.Debug("Stop sensor data collection: ", ctx.Err())
 			return
