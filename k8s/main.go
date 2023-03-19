@@ -10,6 +10,7 @@ import (
 
 	core "github.com/tommzn/hdb-datasource-core"
 	indoorclimate "github.com/tommzn/hdb-datasource-indoorclimate"
+	plugins "github.com/tommzn/hdb-datasource-indoorclimate/plugins"
 	targets "github.com/tommzn/hdb-datasource-indoorclimate/targets"
 )
 
@@ -74,4 +75,45 @@ func newLogger(conf config.Config, secretsMenager secrets.SecretsManager, ctx co
 	}
 	logger.WithContext(log.LogContextWithValues(ctx, logContextValues))
 	return logger
+}
+
+// SubsriptionsFromConfig parse given config to extract topics this client should subscribe and created a corresponding device plugin.
+func SubsriptionsFromConfig(conf config.Config, logger log.Logger) []indoorclimate.MqttSubscriptionConfig {
+
+	listOfSubsriptions := []indoorclimate.MqttSubscriptionConfig{}
+	subscriptions := conf.GetAsSliceOfMaps("mqtt.subscriptions")
+	for _, subscription := range subscriptions {
+
+		topic := extractFromConfig(subscription, "topic")
+		pluginKey := extractFromConfig(subscription, "plugin")
+		devicePlugin := newDevicePlugin(pluginKey, logger)
+		if topic != nil && devicePlugin != nil {
+			listOfSubsriptions = append(listOfSubsriptions, indoorclimate.MqttSubscriptionConfig{Topic: *topic, Plugin: devicePlugin})
+		}
+	}
+	return listOfSubsriptions
+}
+
+// NewDevicePlugin create a new device plugin for given key. If an unknow kex is passed nil is returned.
+func newDevicePlugin(pluginKey *string, logger log.Logger) indoorclimate.DevicePlugin {
+
+	if pluginKey == nil {
+		return nil
+	}
+
+	switch indoorclimate.DevicePluginKey(*pluginKey) {
+	case indoorclimate.PLUGIN_SHELLY:
+		return plugins.NewShellyHTPlugin(logger)
+	default:
+		return nil
+	}
+}
+
+// ExtractFromConfig is a helper to get config data from given map.
+func extractFromConfig(conf map[string]string, key string) *string {
+	if val, ok := conf[key]; ok {
+		return config.AsStringPtr(val)
+	} else {
+		return nil
+	}
 }

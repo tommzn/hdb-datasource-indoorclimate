@@ -20,7 +20,6 @@ func NewMqttCollector(conf config.Config, logger log.Logger) *MqttCollector {
 	}
 
 	mqttCollector.mqttOptions = mqttCollector.mqttClientOptionsFromConfig(conf)
-	mqttCollector.assignSubscriptions(conf)
 	return mqttCollector
 }
 
@@ -82,6 +81,11 @@ func (collector *MqttCollector) AppendTarget(newTarget Publisher) {
 	collector.publisher = append(collector.publisher, newTarget)
 }
 
+// AppendSubscription will append passed subscription to internal subscription list.
+func (collector *MqttCollector) AppendSubscription(subscription MqttSubscriptionConfig) {
+	collector.subscriptions = append(collector.subscriptions, subscription)
+}
+
 // ConnectHandler logs status message after connection to MQTT broker has been established.
 func (collector *MqttCollector) connectHandler(client mqtt.Client) {
 	collector.logger.Info("Connected")
@@ -90,28 +94,6 @@ func (collector *MqttCollector) connectHandler(client mqtt.Client) {
 // ConnectLostHandler logs errors in case connection to MQTT broker get lost.
 func (collector *MqttCollector) connectLostHandler(client mqtt.Client, err error) {
 	collector.logger.Errorf("Connect lost: %v", err)
-}
-
-// ExtractFromConfig is a helper to get config data from given map.
-func extractFromConfig(conf map[string]string, key string) *string {
-	if val, ok := conf[key]; ok {
-		return config.AsStringPtr(val)
-	} else {
-		return nil
-	}
-}
-
-// NewDevicePlugin create a new device plugin for given key. If an unknow kex is passed nil is returned.
-func newDevicePlugin(pluginKey *string) DevicePlugin {
-
-	if pluginKey == nil {
-		return nil
-	}
-
-	switch DevicePluginKey(*pluginKey) {
-	default:
-		return nil
-	}
 }
 
 // MqttClientOptionsFromConfig extracts MQTT client settings from given config.
@@ -126,19 +108,4 @@ func (collector *MqttCollector) mqttClientOptionsFromConfig(conf config.Config) 
 	options.OnConnect = collector.connectHandler
 	options.OnConnectionLost = collector.connectLostHandler
 	return options
-}
-
-// AssignSubscriptions parse given config to extract topics this client should subscribe and created a corresponding device plugin.
-func (collector *MqttCollector) assignSubscriptions(conf config.Config) {
-
-	subscriptions := conf.GetAsSliceOfMaps("mqtt.subscriptions")
-	for _, subscription := range subscriptions {
-
-		topic := extractFromConfig(subscription, "topic")
-		pluginKey := extractFromConfig(subscription, "plugin")
-		devicePlugin := newDevicePlugin(pluginKey)
-		if topic != nil && devicePlugin != nil {
-			collector.subscriptions = append(collector.subscriptions, MqttSubscriptionConfig{Topic: *topic, Plugin: devicePlugin})
-		}
-	}
 }
