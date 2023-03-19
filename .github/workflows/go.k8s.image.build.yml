@@ -1,0 +1,11 @@
+name: Image Build amd64 ((k8s)
+on:
+  create:
+    tags:
+      - k8s/v*
+
+jobs:
+  go-image-build:
+    uses:  tommzn/github-ci/.github/workflows/go.k8s.image.build.amd64.yml@v1.0.16
+    secrets:
+      cr-pat: ${{ secrets.CR_PAT }}
