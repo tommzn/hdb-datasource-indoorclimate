@@ -3,6 +3,7 @@ version: 2.1
 orbs:
   aws-ecr: circleci/aws-ecr@7.3.0
   aws-cli: circleci/aws-cli@2.1.0
+  slack: circleci/slack@4.9.3
 
 jobs:
   go-build:
@@ -40,7 +41,13 @@ jobs:
       - run: 
           name: Update Lambda Function Image
           command: aws lambda update-function-code --region $AWS_REGION --function-name $AWS_LAMBDA_FUNCTION --image-uri ${AWS_ECR_ACCOUNT_URL}/${AWS_ECR_REPOSITORY}:latest
-
+  notify:
+    machine:
+      image: ubuntu-2004:202101-01
+    steps:
+      - slack/notify:
+          template: success_tagged_deploy_1
+  
 workflows:
   version: 2
   aws-lambda-deploy:
@@ -52,6 +59,7 @@ workflows:
             branches:
               only: main
       - ecr-build-and-deploy:
+          context: aws-env
           filters:
             tags:
               only: /^lambda\/v[0-9]+(\.[0-9]+)*$/
@@ -60,6 +68,7 @@ workflows:
           requires:
             - go-build
       - lambda-func-update:
+          context: aws-env
           filters:
             branches:
               ignore: /.*/
@@ -67,4 +76,13 @@ workflows:
               only: /^lambda\/v[0-9]+(\.[0-9]+)*$/
           requires:
             - ecr-build-and-deploy
+      - notify: 
+          context: slack-env
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^lambda\/v[0-9]+(\.[0-9]+)*$/
+          requires:
+            - lambda-func-update
           
