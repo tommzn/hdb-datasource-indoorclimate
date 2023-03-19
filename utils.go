@@ -21,6 +21,18 @@ func extractDeviceId(topic string) *string {
 	return nil
 }
 
+// extractDeviceIdByPattern try to extract a device id from given topic for passed pattern.
+func extractDeviceIdByPattern(topic, pattern string) *string {
+
+	macAddressExp := regexp.MustCompile(pattern)
+	match := macAddressExp.FindStringSubmatch(topic)
+	if len(match) == 1 {
+		firstMatch := match[0]
+		return &firstMatch
+	}
+	return nil
+}
+
 // extractMeasurementType returns topic suffix which is used as measurement type.
 func extractMeasurementType(topic string) *string {
 

@@ -1,5 +1,9 @@
 package indoorclimate
 
+import (
+	mqtt "github.com/eclipse/paho.mqtt.golang"
+)
+
 // Publisher sends given measuremnts to different targets.
 type Publisher interface {
 
@@ -21,4 +25,19 @@ type SensorDevice interface {
 
 	// ReadValue will try to read measurment value for given characteristics.
 	ReadValue(string) ([]byte, error)
+}
+
+// MqttSubscription is used to handle messages received from subscribes MQTT topics.
+type MqttSubscription interface {
+
+	// MessageHandler process received data received from a mqtt topic
+	MessageHandler(mqtt.Client, mqtt.Message)
+}
+
+// DevicePlugin is used to subscribe to MQTT topics and extract measurements from published data.
+type DevicePlugin interface {
+	MqttSubscription
+
+	// SetMeasurementChannel assigns a channel plugin should write extracted indoor climate measurements to.
+	SetMeasurementChannel(chan<- IndoorClimateMeasurement)
 }

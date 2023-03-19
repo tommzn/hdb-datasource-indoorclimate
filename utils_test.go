@@ -31,6 +31,9 @@ func (suite *UtilsTestSuite) TestExtractDeviceId() {
 	deviceId := extractDeviceId("iobroker/ble/0/" + macAddress + "/temperature")
 	suite.NotNil(deviceId)
 	suite.Equal(macAddress, *deviceId)
+
+	suite.NotNil(extractDeviceIdByPattern("prefix/123-456-789/test/1", "[0-9]{3}-[0-9]{3}-[0-9]{3}"))
+	suite.Nil(extractDeviceIdByPattern("prefix/123-456-xxx/test/1", "[0-9]{3}-[0-9]{3}-[0-9]{3}"))
 }
 
 func (suite *UtilsTestSuite) TestExtractMeasurementType() {

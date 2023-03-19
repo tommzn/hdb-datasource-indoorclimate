@@ -1,0 +1,9 @@
+
+log:
+  type: local
+  loglevel: debug
+
+mqtt:
+  broker: invalid_broker
+  subscriptions:
+    - topic: topic01

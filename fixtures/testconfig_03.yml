@@ -1,0 +1,15 @@
+
+log:
+  type: local
+  loglevel: debug
+
+mqtt:
+  broker: localhost
+  port: 1883
+  subscriptions:
+    - topic: topic01
+    - topic: topic02
+      plugin: shelly
+    - topic: topic03
+      plugin: xxx
+      

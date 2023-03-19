@@ -3,9 +3,17 @@ package indoorclimate
 import (
 	"time"
 
+	mqtt "github.com/eclipse/paho.mqtt.golang"
 	btdevice "github.com/muka/go-bluetooth/bluez/profile/device"
 	log "github.com/tommzn/go-log"
 	utils "github.com/tommzn/go-utils"
+)
+
+// DevicePluginKey defines a plugin for devices of a specific manufacturer.
+type DevicePluginKey string
+
+const (
+	PLUGIN_SHELLY DevicePluginKey = "shelly"
 )
 
 // MeasurementType is a indoor climate date type, e.g. temperature.
@@ -55,4 +63,19 @@ type SensorDataCollector struct {
 	schedule        *time.Duration
 	errorStack      *utils.ErrorStack
 	done            chan struct{}
+}
+
+// MqttCollector subcribes to MQTT topics to extract indoor climate date from published messages.
+type MqttCollector struct {
+	logger        log.Logger
+	publisher     []Publisher
+	measurements  chan IndoorClimateMeasurement
+	subscriptions []MqttSubscriptionConfig
+	mqttOptions   *mqtt.ClientOptions
+}
+
+// MqttSubscriptionConfig define a MQTT topic and it's message handler plugin.
+type MqttSubscriptionConfig struct {
+	Topic  string
+	Plugin DevicePlugin
 }
