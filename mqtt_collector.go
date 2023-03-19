@@ -44,14 +44,18 @@ func (collector *MqttCollector) Run(ctx context.Context) error {
 // Subscribe to MQTT topics and handle incoming message by device plugins to extract indoor climate data.
 func (collector *MqttCollector) subscribe(client mqtt.Client, ctx context.Context) {
 
+	collector.logger.Debugf("Subscriptions; %d", len(collector.subscriptions))
 	for _, subscription := range collector.subscriptions {
 		subscription.Plugin.SetMeasurementChannel(collector.measurements)
 		token := client.Subscribe(subscription.Topic, 1, subscription.Plugin.MessageHandler)
 		token.Wait()
 		if token.Error() != nil {
 			collector.logger.Errorf("Unable to subscribe to topic; %s, reason: ", subscription.Topic, token.Error())
+		} else {
+			collector.logger.Debugf("Successful subscribed to topic %s", subscription.Topic)
 		}
 	}
+	collector.logger.Flush()
 
 	for {
 		select {
