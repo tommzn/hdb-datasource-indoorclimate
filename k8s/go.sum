@@ -476,6 +476,8 @@ github.com/tommzn/go-secrets v1.0.2 h1:+oDkPga3IbHxfQ+A9v03CsH4P5nU0lIwB8sBUodYb
 github.com/tommzn/go-secrets v1.0.2/go.mod h1:ZCiO/36WGUEgk5K7+S3U/JKIp4ghe5OA2fkckVN32/8=
 github.com/tommzn/go-secrets v1.1.1 h1:Ss2LaKdQSMlO6Z180U9GJfitCsXxTdS/fXZUzXXx3zM=
 github.com/tommzn/go-secrets v1.1.1/go.mod h1:ZCiO/36WGUEgk5K7+S3U/JKIp4ghe5OA2fkckVN32/8=
+github.com/tommzn/go-secrets v1.1.2 h1:OTjPeXtRMMxjO4HZAmfNeSWCXzo4wFczSYveDeuz+QA=
+github.com/tommzn/go-secrets v1.1.2/go.mod h1:ZCiO/36WGUEgk5K7+S3U/JKIp4ghe5OA2fkckVN32/8=
 github.com/tommzn/go-utils v1.0.1 h1:GSPyGFBcucd17ZxRRyFYTLcgHo+p+SZoWfHKzt32kJg=
 github.com/tommzn/go-utils v1.0.1/go.mod h1:TaQQLOtzHNmRx+/WUHgyNYvsqUX1N0JJEePC8Pye0Ow=
 github.com/tommzn/go-utils v1.0.2 h1:OnUdCJC46ogBDNnt+zwG1bN/RyoYoeNWBvPTbBITIGo=
@@ -512,6 +514,8 @@ github.com/tommzn/hdb-datasource-indoorclimate v1.6.7 h1:vAKqNVeDSeLmAL4YPGYSDzs
 github.com/tommzn/hdb-datasource-indoorclimate v1.6.7/go.mod h1:APqSi7DqfDNg0ggUGv839+/A4PINh1z1GTzMT7vRNbw=
 github.com/tommzn/hdb-datasource-indoorclimate v1.6.8 h1:ogXisVDBGajoEOzRgZBHwWtcqR/w8brj7se/u3Ap6Y4=
 github.com/tommzn/hdb-datasource-indoorclimate v1.6.8/go.mod h1:WTtgOdg3KoDP5OiUb8G2IWjTZ8M2unc0ZNRZsz+94yA=
+github.com/tommzn/hdb-datasource-indoorclimate v1.6.9 h1:EFdHpaomR+n0VR1fIZj5NxCChZu639WlxddvA8FlqrU=
+github.com/tommzn/hdb-datasource-indoorclimate v1.6.9/go.mod h1:WTtgOdg3KoDP5OiUb8G2IWjTZ8M2unc0ZNRZsz+94yA=
 github.com/tommzn/hdb-datasource-indoorclimate/plugins v1.0.2 h1:wtK4G4+m52LDUFs+JHMnlBaiCXZLUnQRfcA5z80z0pA=
 github.com/tommzn/hdb-datasource-indoorclimate/plugins v1.0.2/go.mod h1:DGawhc2knq1ldeE2JYoXq1lPkpEAXxgz7ys6bTr36sc=
 github.com/tommzn/hdb-datasource-indoorclimate/targets v1.0.6 h1:dD3Wf7qpIUHSDk8mMz0oDzbxZfZzJUL0srzUaOKYtN8=
