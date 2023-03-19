@@ -5,6 +5,7 @@ import (
 	log "github.com/tommzn/go-log"
 	metrics "github.com/tommzn/go-metrics"
 	core "github.com/tommzn/hdb-datasource-core"
+	indoorclimate "github.com/tommzn/hdb-datasource-indoorclimate"
 )
 
 // SqsTarget sends passed indoor climate data to a AWS SQS queue.
@@ -26,4 +27,9 @@ type TimestreamTarget struct {
 
 // StdoutTarget writes given indoor climate data to Stdout unsing fmt package.
 type StdoutTarget struct {
+}
+
+// MockTarget can be used for testing. It appends all measurements to an internal slice.
+type MockTarget struct {
+	Measurements []indoorclimate.IndoorClimateMeasurement
 }
