@@ -1,0 +1,58 @@
+{
+    "dst": "shellyplusht-08b61fcf7960\/events",
+    "src": "shellyplusht-08b61fcf7960",
+    "method": "NotifyFullStatus",
+    "params": {
+        "temperature:0": {
+            "tF": 72.5,
+            "id": 0,
+            "tC": 22.5
+        },
+        "sys": {
+            "wakeup_reason": {
+                "cause": "status_update",
+                "boot": "deepsleep_wake"
+            },
+            "restart_required": false,
+            "available_updates": {},
+            "cfg_rev": 11,
+            "unixtime": null,
+            "time": null,
+            "ram_free": 150856,
+            "uptime": 1,
+            "ram_size": 254864,
+            "fs_size": 458752,
+            "fs_free": 196608,
+            "mac": "08B61FCF7960"
+        },
+        "mqtt": {
+            "connected": true
+        },
+        "humidity:0": {
+            "rh": 51.100000000000001,
+            "id": 0
+        },
+        "wifi": {
+            "ssid": "home.tommzn.de",
+            "status": "got ip",
+            "sta_ip": "192.168.178.94",
+            "rssi": -37
+        },
+        "ts": 1679169527.78,
+        "cloud": {
+            "connected": false
+        },
+        "ht_ui": {},
+        "ble": {},
+        "devicepower:0": {
+            "battery": {
+                "V": 0.42999999999999999,
+                "percent": 0
+            },
+            "id": 0,
+            "external": {
+                "present": true
+            }
+        }
+    }
+}
