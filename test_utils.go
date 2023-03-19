@@ -21,18 +21,3 @@ func loadConfigForTest(fileName *string) config.Config {
 func loggerForTest() log.Logger {
 	return log.NewLogger(log.Debug, nil, nil)
 }
-
-func newTestTarget() *testTarget {
-	return &testTarget{
-		measurements: []IndoorClimateMeasurement{},
-	}
-}
-
-type testTarget struct {
-	measurements []IndoorClimateMeasurement
-}
-
-func (target *testTarget) SendMeasurement(measurement IndoorClimateMeasurement) error {
-	target.measurements = append(target.measurements, measurement)
-	return nil
-}

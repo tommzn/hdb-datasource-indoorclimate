@@ -66,8 +66,8 @@ func (suite *MqttCollectorTestSuite) TestConsumeIndoorClimateData() {
 	// Prepare
 	suite.connectToMqttBroker()
 	suite.subscribeToTestTopic(collector)
-	testTarget := newTestTarget()
-	collector.AppendTarget(testTarget)
+	mockTarget := NewMockTarget()
+	collector.AppendTarget(mockTarget)
 
 	// Run
 	go collector.Run(ctx)
@@ -84,7 +84,7 @@ func (suite *MqttCollectorTestSuite) TestConsumeIndoorClimateData() {
 
 	// Assertions
 	suite.Len(collector.measurements, 0)
-	suite.Len(testTarget.measurements, 4)
+	suite.Len(mockTarget.Measurements, 4)
 }
 
 func (suite *MqttCollectorTestSuite) TestBrokerConnectError() {
@@ -98,7 +98,7 @@ func (suite *MqttCollectorTestSuite) TestBrokerConnectError() {
 }
 
 func (suite *MqttCollectorTestSuite) subscribeToTestTopic(collector *MqttCollector) {
-	plugin := newtestPlugin(suite.logger, nil)
+	plugin := NewMockPlugin(suite.logger, nil)
 	collector.subscriptions = append(collector.subscriptions, MqttSubscriptionConfig{Topic: suite.topic, Plugin: plugin})
 }
 

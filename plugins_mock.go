@@ -1,4 +1,4 @@
-package plugins
+package indoorclimate
 
 import (
 	"time"
@@ -6,7 +6,6 @@ import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	config "github.com/tommzn/go-config"
 	log "github.com/tommzn/go-log"
-	indoorclimate "github.com/tommzn/hdb-datasource-indoorclimate"
 )
 
 // MockPlugin can be used for testing.
@@ -21,7 +20,7 @@ import (
 //	battery		|	Capacity 87%
 //	<default>	|	Temperature 12.3°C
 type MockPlugin struct {
-	measurementChan chan<- indoorclimate.IndoorClimateMeasurement
+	measurementChan chan<- IndoorClimateMeasurement
 	logger          log.Logger
 	deviceId        string
 }
@@ -39,34 +38,34 @@ func (plugin *MockPlugin) MessageHandler(client mqtt.Client, message mqtt.Messag
 
 	plugin.logger.Debugf("Received, Topic: %s, Message: %s", message.Topic(), message.Payload())
 
-	var measurement indoorclimate.IndoorClimateMeasurement
+	var measurement IndoorClimateMeasurement
 	switch string(message.Payload()) {
 	case "temperature":
-		measurement = indoorclimate.IndoorClimateMeasurement{
+		measurement = IndoorClimateMeasurement{
 			DeviceId:  plugin.deviceId,
 			Timestamp: time.Now(),
-			Type:      indoorclimate.MEASUREMENTTYPE_TEMPERATURE,
+			Type:      MEASUREMENTTYPE_TEMPERATURE,
 			Value:     "24.7",
 		}
 	case "humidity":
-		measurement = indoorclimate.IndoorClimateMeasurement{
+		measurement = IndoorClimateMeasurement{
 			DeviceId:  plugin.deviceId,
 			Timestamp: time.Now(),
-			Type:      indoorclimate.MEASUREMENTTYPE_HUMIDITY,
+			Type:      MEASUREMENTTYPE_HUMIDITY,
 			Value:     "53.9",
 		}
 	case "battery":
-		measurement = indoorclimate.IndoorClimateMeasurement{
+		measurement = IndoorClimateMeasurement{
 			DeviceId:  plugin.deviceId,
 			Timestamp: time.Now(),
-			Type:      indoorclimate.MEASUREMENTTYPE_BATTERY,
+			Type:      MEASUREMENTTYPE_BATTERY,
 			Value:     "87",
 		}
 	default:
-		measurement = indoorclimate.IndoorClimateMeasurement{
+		measurement = IndoorClimateMeasurement{
 			DeviceId:  plugin.deviceId,
 			Timestamp: time.Now(),
-			Type:      indoorclimate.MEASUREMENTTYPE_TEMPERATURE,
+			Type:      MEASUREMENTTYPE_TEMPERATURE,
 			Value:     "12.3",
 		}
 	}
@@ -76,6 +75,6 @@ func (plugin *MockPlugin) MessageHandler(client mqtt.Client, message mqtt.Messag
 }
 
 // SetMeasurementChannel assign a channel measuremnts should be written to.
-func (plugin *MockPlugin) SetMeasurementChannel(channel chan<- indoorclimate.IndoorClimateMeasurement) {
+func (plugin *MockPlugin) SetMeasurementChannel(channel chan<- IndoorClimateMeasurement) {
 	plugin.measurementChan = channel
 }
