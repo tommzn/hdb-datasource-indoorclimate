@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	oslog "log"
 	"os"
 
 	config "github.com/tommzn/go-config"
@@ -29,8 +28,6 @@ func main() {
 func bootstrap(ctx context.Context) (core.Collector, error) {
 
 	secretsManager := newSecretsManager()
-	oslog.Printf("ENV: &+v\n", os.Environ())
-
 	conf := loadConfig()
 	logger := newLogger(conf, secretsManager, ctx)
 	datasource := indoorclimate.NewMqttCollector(conf, logger)
