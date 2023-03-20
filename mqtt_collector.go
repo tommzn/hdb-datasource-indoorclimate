@@ -33,10 +33,14 @@ func (collector *MqttCollector) Run(ctx context.Context) error {
 		collector.logger.Error("Unable to connect to MQTT broker, reason: ", connectError)
 		return connectError
 	}
+	collector.logger.Info("Connected to MQTT broker")
 
 	go collector.subscribe(client, ctx)
 
+	collector.logger.Info("Processing messages...")
+	collector.logger.Flush()
 	<-ctx.Done()
+	collector.logger.Info("Process cancelation received, disconnect from MQTT.")
 	client.Disconnect(250)
 	return nil
 }
