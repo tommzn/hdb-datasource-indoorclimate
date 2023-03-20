@@ -37,6 +37,10 @@ func bootstrap(ctx context.Context) (core.Collector, error) {
 	if timestreamTable := conf.Get("aws.timestream.table", nil); timestreamTable != nil {
 		datasource.AppendTarget(targets.NewTimestreamTarget(conf, logger))
 	}
+	subsriptions := SubsriptionsFromConfig(conf, logger)
+	for _, subsription := range subsriptions {
+		datasource.AppendSubscription(subsription)
+	}
 	return core.NewContinuousCollector(datasource, logger), nil
 }
 
