@@ -69,6 +69,7 @@ func (plugin *ShellyHTPlugin) MessageHandler(client mqtt.Client, message mqtt.Me
 	plugin.logger.Debugf("Received, Topic: %s, Message: %s", message.Topic(), message.Payload())
 
 	eventType := getEventType(message.Payload())
+	plugin.logger.Statusf("Event Type: %s", eventType)
 	if eventType == SHELLYHT_NOTIFYFULLSTATUS {
 
 		var event ShellyHT_NotifyFullStatus
