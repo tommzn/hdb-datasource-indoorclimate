@@ -522,6 +522,8 @@ github.com/tommzn/hdb-datasource-indoorclimate v1.6.11 h1:m+xSHWulBT7gPsbWPty4OD
 github.com/tommzn/hdb-datasource-indoorclimate v1.6.11/go.mod h1:WTtgOdg3KoDP5OiUb8G2IWjTZ8M2unc0ZNRZsz+94yA=
 github.com/tommzn/hdb-datasource-indoorclimate v1.6.12 h1:iZCkJl297FIfwIV6KLrWM/2sw6gDUw/ANDDsllvE3qU=
 github.com/tommzn/hdb-datasource-indoorclimate v1.6.12/go.mod h1:xE2CtJJrh4ZjGmIXo4eWD0cLDF5Y9JGQQWReWy/msxY=
+github.com/tommzn/hdb-datasource-indoorclimate v1.6.13 h1:ZciqOMbGv+ub4JEevIellUhoCHGLzMov6uUekblWc3k=
+github.com/tommzn/hdb-datasource-indoorclimate v1.6.13/go.mod h1:xE2CtJJrh4ZjGmIXo4eWD0cLDF5Y9JGQQWReWy/msxY=
 github.com/tommzn/hdb-datasource-indoorclimate/plugins v1.0.2 h1:wtK4G4+m52LDUFs+JHMnlBaiCXZLUnQRfcA5z80z0pA=
 github.com/tommzn/hdb-datasource-indoorclimate/plugins v1.0.2/go.mod h1:DGawhc2knq1ldeE2JYoXq1lPkpEAXxgz7ys6bTr36sc=
 github.com/tommzn/hdb-datasource-indoorclimate/plugins v1.0.3 h1:qiBiR/cWpR33pPs2CiPkELzLG3THA74yg2OmswXnIIs=
