@@ -3,6 +3,7 @@ package indoorclimate
 import (
 	"context"
 	"fmt"
+	oslog "log"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	config "github.com/tommzn/go-config"
@@ -34,13 +35,16 @@ func (collector *MqttCollector) Run(ctx context.Context) error {
 		return connectError
 	}
 	collector.logger.Info("Connected to MQTT broker")
+	oslog.Println("Connected to MQTT Broker.")
 
 	go collector.subscribe(client, ctx)
 
 	collector.logger.Info("Processing messages...")
+	oslog.Println("Processing messages...")
 	collector.logger.Flush()
 	<-ctx.Done()
 	collector.logger.Info("Process cancelation received, disconnect from MQTT.")
+	oslog.Println("Process cancelation received, disconnect from MQTT.")
 	client.Disconnect(250)
 	return nil
 }
@@ -57,6 +61,8 @@ func (collector *MqttCollector) subscribe(client mqtt.Client, ctx context.Contex
 			collector.logger.Errorf("Unable to subscribe to topic; %s, reason: ", subscription.Topic, token.Error())
 		} else {
 			collector.logger.Debugf("Successful subscribed to topic %s", subscription.Topic)
+			oslog.Println("Successful subscribed to topic ", subscription.Topic)
+
 		}
 	}
 	collector.logger.Flush()
@@ -73,6 +79,7 @@ func (collector *MqttCollector) subscribe(client mqtt.Client, ctx context.Contex
 			collector.logger.Flush()
 		case <-ctx.Done():
 			collector.logger.Debug("Stop sensor data collection: ", ctx.Err())
+			oslog.Println("Canceled.")
 			return
 		}
 	}
