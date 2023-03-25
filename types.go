@@ -14,6 +14,7 @@ type DevicePluginKey string
 
 const (
 	PLUGIN_SHELLY DevicePluginKey = "shelly"
+	PLUGIN_LOGGER DevicePluginKey = "logger"
 )
 
 // MeasurementType is a indoor climate date type, e.g. temperature.
