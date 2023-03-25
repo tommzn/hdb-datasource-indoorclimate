@@ -108,6 +108,8 @@ func newDevicePlugin(pluginKey *string, logger log.Logger) indoorclimate.DeviceP
 	switch indoorclimate.DevicePluginKey(*pluginKey) {
 	case indoorclimate.PLUGIN_SHELLY:
 		return plugins.NewShellyHTPlugin(logger)
+	case indoorclimate.PLUGIN_LOGGER:
+		return plugins.NewLoggerPlugin(logger)
 	default:
 		return nil
 	}
