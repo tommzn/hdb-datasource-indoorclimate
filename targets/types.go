@@ -2,6 +2,7 @@
 package targets
 
 import (
+	pubsub "github.com/tommzn/aws-pub-sub"
 	log "github.com/tommzn/go-log"
 	metrics "github.com/tommzn/go-metrics"
 	core "github.com/tommzn/hdb-datasource-core"
@@ -26,4 +27,14 @@ type TimestreamTarget struct {
 
 // StdoutTarget writes given indoor climate data to Stdout unsing fmt package.
 type StdoutTarget struct {
+}
+
+// SnsTarget sends passed indoor climate data to a AWS SNS topic.
+type SnsTarget struct {
+
+	// topicArn defines target mesages should be send to.
+	topicArn *string
+
+	// Publisher is a SNS client to publish messages.
+	publisher pubsub.Publisher
 }
