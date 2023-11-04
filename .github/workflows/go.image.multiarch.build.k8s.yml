@@ -1,0 +1,12 @@
+name: Go Package Release
+on:
+  push:
+    tags:
+      - 'k8s/v*.*.*'
+permissions:
+  packages: write
+
+
+jobs:
+  go-auto-ci:
+    uses:  tommzn/github-ci/.github/workflows/go.image.multiarch.build.k8s.yml@v1.0.68
