@@ -6,7 +6,6 @@ on:
 permissions:
   contents: write
 
-
 jobs:
   go-auto-ci:
-    uses:  tommzn/github-ci/.github/workflows/go.pkg.auto-ci.yml@v1.0.63
+    uses:  tommzn/github-ci/.github/workflows/go.pkg.auto-ci.mqtt.yml@v1.0.67
