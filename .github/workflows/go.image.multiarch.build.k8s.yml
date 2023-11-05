@@ -3,10 +3,9 @@ on:
   push:
     tags:
       - 'k8s/v*.*.*'
-permissions:
-  packages: write
-
 
 jobs:
   go-multi-arch-image-build:
-    uses:  tommzn/github-ci/.github/workflows/go.image.multiarch.build.k8s.yml@v1.0.70
+    uses:  tommzn/github-ci/.github/workflows/go.image.multiarch.build.k8s.yml@v1.0.71
+    secrets:
+      cr-pat: ${{ secrets.CR_PAT }}
