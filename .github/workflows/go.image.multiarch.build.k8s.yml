@@ -1,4 +1,4 @@
-name: Go Package Release
+name: Go Multi Arch Image Build
 on:
   push:
     tags:
@@ -8,5 +8,5 @@ permissions:
 
 
 jobs:
-  go-auto-ci:
-    uses:  tommzn/github-ci/.github/workflows/go.image.multiarch.build.k8s.yml@v1.0.69
+  go-multi-arch-image-build:
+    uses:  tommzn/github-ci/.github/workflows/go.image.multiarch.build.k8s.yml@v1.0.70
