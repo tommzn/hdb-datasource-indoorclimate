@@ -2,6 +2,10 @@
 package targets
 
 import (
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	pubsub "github.com/tommzn/aws-pub-sub"
 	log "github.com/tommzn/go-log"
 	metrics "github.com/tommzn/go-metrics"
@@ -37,4 +41,15 @@ type SnsTarget struct {
 
 	// Publisher is a SNS client to publish messages.
 	publisher pubsub.Publisher
+}
+
+// S3Target uploads passed indoor climate measurement to a AWS S3 bucket.
+type S3Target struct {
+	logger     log.Logger
+	bucket     *string
+	path       *string
+	awsConfig  *aws.Config
+	s3Client   *s3.S3
+	awsSession *session.Session
+	s3Uploader *s3manager.Uploader
 }
