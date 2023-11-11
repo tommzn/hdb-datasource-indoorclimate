@@ -40,6 +40,11 @@ func bootstrap(ctx context.Context) (core.Collector, error) {
 	if topicArn := conf.Get("hdb.topic.arn", nil); topicArn != nil {
 		datasource.AppendTarget(targets.NewSnsTarget(conf))
 	}
+	if bucket := conf.Get("aws.s3.bucket", nil); bucket != nil {
+		if s3Target, err := targets.NewS3Target(conf); err == nil {
+			datasource.AppendTarget(s3Target)
+		}
+	}
 	subsriptions := SubsriptionsFromConfig(conf, logger)
 	for _, subsription := range subsriptions {
 		datasource.AppendSubscription(subsription)
