@@ -23,8 +23,9 @@ COPY .  .
 
 RUN go build -tags musl -ldflags '-extldflags "-static"' -o build_artifact_bin
 
-FROM --platform=linux/${TARGETARCH:-amd64} gcr.io/distroless/static:nonroot
+FROM busybox:1.35.0-uclibc as busybox
 
+FROM --platform=linux/${TARGETARCH:-amd64} gcr.io/distroless/static:nonroot
 
 LABEL org.opencontainers.image.source=https://github.com/tommzn/hdb-datasource-indoorclimate
 
@@ -32,5 +33,8 @@ WORKDIR /go
 
 COPY --from=builder /go/build/build_artifact_bin hdb-bin
 USER nonroot:nonroot
+
+COPY --from=busybox /bin/sh /bin/sh
+COPY --from=busybox /bin/ls /bin/ls
 
 ENTRYPOINT ["/go/hdb-bin"]
