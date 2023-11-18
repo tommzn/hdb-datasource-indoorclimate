@@ -28,6 +28,9 @@ FROM busybox:1.35.0-uclibc as busybox
 
 FROM --platform=linux/${TARGETARCH:-amd64} gcr.io/distroless/static:nonroot
 
+ARG TARGETOS
+ARG TARGETARCH
+
 LABEL org.opencontainers.image.source=https://github.com/tommzn/hdb-datasource-indoorclimate
 
 WORKDIR /go
