@@ -32,13 +32,14 @@ LABEL org.opencontainers.image.source=https://github.com/tommzn/hdb-datasource-i
 
 WORKDIR /go
 
-COPY --from=builder /go/build/build_artifact_bin hdb-bin
-COPY --from=builder /go/build/build.arch build.arch
-RUN echo "${TARGETOS}/${TARGETARCH}" > runtime.arch
-USER nonroot:nonroot
-
 COPY --from=busybox /bin/sh /bin/sh
 COPY --from=busybox /bin/ls /bin/ls
-COPY --from=busybox /bin/ls /bin/cat
+COPY --from=busybox /bin/cat /bin/cat
+COPY --from=busybox /bin/echo /bin/echo
+
+COPY --from=builder /go/build/build_artifact_bin hdb-bin
+COPY --from=builder /go/build/build.arch build.arch
+RUN /bin/echo "${TARGETOS}/${TARGETARCH}" > runtime.arch
+USER nonroot:nonroot
 
 ENTRYPOINT ["/go/hdb-bin"]
