@@ -22,6 +22,7 @@ RUN apk update && apk upgrade && apk add pkgconf git bash build-base sudo gcc mu
 COPY .  .
 
 RUN go build -tags musl -ldflags '-extldflags "-static"' -o build_artifact_bin
+RUN echo "${TARGETOS}/${TARGETARCH}" > build.arch
 
 FROM busybox:1.35.0-uclibc as busybox
 
