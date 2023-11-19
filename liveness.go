@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"math/rand"
+	"sync"
 	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
@@ -29,8 +30,9 @@ func NewMqttLivenessObserver(conf config.Config, logger log.Logger) *MqttLivenes
 }
 
 // Run liveness prove on given schedule.
-func (observer *MqttLivenessObserver) Run(ctx context.Context) error {
+func (observer *MqttLivenessObserver) Run(ctx context.Context, wg *sync.WaitGroup) error {
 
+	defer wg.Done()
 	defer observer.logger.Flush()
 
 	client, connectError := observer.mqttConnect()

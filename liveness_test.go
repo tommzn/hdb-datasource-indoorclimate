@@ -2,6 +2,7 @@ package indoorclimate
 
 import (
 	"context"
+	"sync"
 	"testing"
 	"time"
 
@@ -23,8 +24,11 @@ func (suite *LivenessestSuite) TestLivenessProve() {
 	conf := loadConfigForTest(config.AsStringPtr("fixtures/testconfig_05.yml"))
 	observer := NewMqttLivenessObserver(conf, logger)
 	ctx, _ := context.WithTimeout(context.Background(), time.Second*5)
+	wg := &sync.WaitGroup{}
+	wg.Add(1)
 
-	observer.Run(ctx)
+	observer.Run(ctx, wg)
 
 	<-ctx.Done()
+	wg.Wait()
 }
