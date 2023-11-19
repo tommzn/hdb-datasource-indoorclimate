@@ -11,6 +11,7 @@ import (
 	log "github.com/tommzn/go-log"
 )
 
+// NewMqttLivenessObserver creates a new liveness probe for MQTT.
 func NewMqttLivenessObserver(conf config.Config, logger log.Logger) *MqttLivenessObserver {
 
 	livenessTopic := conf.Get("mqtt.liveness.topic", config.AsStringPtr("/hdb/liveness"))
@@ -27,6 +28,7 @@ func NewMqttLivenessObserver(conf config.Config, logger log.Logger) *MqttLivenes
 	return observer
 }
 
+// Run liveness prove on given schedule.
 func (observer *MqttLivenessObserver) Run(ctx context.Context) error {
 
 	defer observer.logger.Flush()
@@ -53,7 +55,7 @@ func (observer *MqttLivenessObserver) Run(ctx context.Context) error {
 		for {
 			select {
 			case <-ticker.C:
-				err := observer.liveness(client)
+				err := observer.livenessProbe(client)
 				if err != nil {
 					errorChan <- err
 					return
@@ -71,7 +73,8 @@ func (observer *MqttLivenessObserver) Run(ctx context.Context) error {
 	return err
 }
 
-func (observer *MqttLivenessObserver) liveness(client mqtt.Client) error {
+// LivenessProbe sends a random message to a liveness topic and ensure it will be received.
+func (observer *MqttLivenessObserver) livenessProbe(client mqtt.Client) error {
 
 	defer observer.logger.Flush()
 
@@ -98,6 +101,7 @@ func (observer *MqttLivenessObserver) liveness(client mqtt.Client) error {
 	return nil
 }
 
+// MessageHandler listen for message on liveness topic and writes them to internal prove chan.
 func (observer *MqttLivenessObserver) MessageHandler(mclient mqtt.Client, msg mqtt.Message) {
 	observer.logger.Statusf("Liveness message received. Topic: %s, MEssage: '%s'", msg.Topic(), msg.Payload())
 	observer.probeChan <- string(msg.Payload())
@@ -136,6 +140,7 @@ func (observer *MqttLivenessObserver) mqttClientOptionsFromConfig(conf config.Co
 	return options
 }
 
+// RandomMessage returns a message with randon chars of given length.
 func randomMessage(length int) string {
 	rand.Seed(time.Now().UnixNano())
 	b := make([]byte, length+2)
