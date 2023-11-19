@@ -85,7 +85,7 @@ func (observer *MqttLivenessObserver) livenessProbe(client mqtt.Client) error {
 		observer.logger.Error("Unable to public liveness probe, reason: ", publishErr)
 		return nil
 	}
-	observer.logger.Status("Liveness message send.")
+	observer.logger.Status("Liveness message published.")
 
 	timer := time.NewTimer(observer.wait)
 	select {
