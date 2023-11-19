@@ -52,3 +52,13 @@ type MqttSubscriptionConfig struct {
 	Topic  string
 	Plugin DevicePlugin
 }
+
+// MqttLivenessObserver can be use to observer a MQTT server.
+type MqttLivenessObserver struct {
+	logger        log.Logger
+	mqttOptions   *mqtt.ClientOptions
+	livenessTopic string
+	schedule      time.Duration
+	wait          time.Duration
+	probeChan     chan string
+}

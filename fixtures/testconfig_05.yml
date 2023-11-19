@@ -1,0 +1,12 @@
+
+log:
+  type: local
+  loglevel: debug
+
+mqtt:
+  broker: localhost
+  port: 1883
+  liveness:
+    topic: /testing/livenessprobe
+    schedule: 2s
+    wait: 2s
