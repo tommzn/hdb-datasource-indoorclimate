@@ -3,11 +3,13 @@ package main
 import (
 	"context"
 	"os"
+	"sync"
 
 	config "github.com/tommzn/go-config"
 	log "github.com/tommzn/go-log"
 	secrets "github.com/tommzn/go-secrets"
 
+	hdbcore "github.com/tommzn/hdb-core"
 	core "github.com/tommzn/hdb-datasource-core"
 	indoorclimate "github.com/tommzn/hdb-datasource-indoorclimate"
 	plugins "github.com/tommzn/hdb-datasource-indoorclimate/plugins"
@@ -17,15 +19,22 @@ import (
 func main() {
 
 	ctx := context.Background()
-	collector, err := bootstrap(ctx)
+	collector, LivenessObserver, err := bootstrap(ctx)
 	if err != nil {
 		panic(err)
 	}
+
+	wg := &sync.WaitGroup{}
+	wg.Add(1)
+	if LivenessObserver != nil {
+		go LivenessObserver.Run(ctx, wg)
+	}
 	collector.Run(ctx)
+	wg.Wait()
 }
 
 // bootstrap loads config and creates a new scheduled collector with a exchangerate datasource.
-func bootstrap(ctx context.Context) (core.Collector, error) {
+func bootstrap(ctx context.Context) (core.Collector, hdbcore.Runable, error) {
 
 	secretsManager := newSecretsManager()
 	conf := loadConfig()
@@ -49,7 +58,14 @@ func bootstrap(ctx context.Context) (core.Collector, error) {
 	for _, subsription := range subsriptions {
 		datasource.AppendSubscription(subsription)
 	}
-	return core.NewContinuousCollector(datasource, logger), nil
+
+	var livenessObserver hdbcore.Runable
+	livenessTopic := conf.Get("mqtt.lineness.topic", nil)
+	if livenessTopic == nil {
+		livenessObserver = indoorclimate.NewMqttLivenessObserver(conf, logger)
+	}
+
+	return core.NewContinuousCollector(datasource, logger), livenessObserver, nil
 }
 
 // loadConfig from config file.

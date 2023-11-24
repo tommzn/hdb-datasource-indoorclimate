@@ -1,13 +1,15 @@
 module github.com/tommzn/hdb-datasource-indoorclimate/k8s
 
-go 1.19
+go 1.21
+
+toolchain go1.21.4
 
 require (
 	github.com/tommzn/go-config v1.2.1
 	github.com/tommzn/go-log v1.2.2
 	github.com/tommzn/go-secrets v1.1.2
 	github.com/tommzn/hdb-datasource-core v1.2.3
-	github.com/tommzn/hdb-datasource-indoorclimate v1.8.0
+	github.com/tommzn/hdb-datasource-indoorclimate v1.8.2
 	github.com/tommzn/hdb-datasource-indoorclimate/plugins v1.0.5
 	github.com/tommzn/hdb-datasource-indoorclimate/targets v1.0.12
 )
@@ -37,6 +39,7 @@ require (
 	github.com/tommzn/aws-sqs v1.1.1 // indirect
 	github.com/tommzn/go-metrics v1.0.1 // indirect
 	github.com/tommzn/go-utils v1.0.2 // indirect
+	github.com/tommzn/hdb-core v1.0.3 // indirect
 	github.com/tommzn/hdb-events-go v1.0.16 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/exp v0.0.0-20231006140011-7918f672742d // indirect
