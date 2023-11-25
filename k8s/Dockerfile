@@ -1,4 +1,4 @@
-FROM --platform=linux/${TARGETARCH:-amd64} golang:1.19-alpine as builder
+FROM --platform=linux/${TARGETARCH:-amd64} golang:1.21-alpine as builder
 
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
