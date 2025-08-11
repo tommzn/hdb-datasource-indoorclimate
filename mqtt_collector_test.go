@@ -50,7 +50,7 @@ func (suite *MqttCollectorTestSuite) TestCreateClient() {
 
 	conf := loadConfigForTest(config.AsStringPtr("fixtures/testconfig_03.yml"))
 
-	collector01 := NewMqttCollector(conf, suite.logger)
+	collector01 := NewMqttCollector(conf, suite.logger, secretsManagerForTest())
 	suite.NotNil(collector01)
 	suite.Len(collector01.publisher, 0)
 	suite.Len(collector01.subscriptions, 0)
@@ -60,7 +60,7 @@ func (suite *MqttCollectorTestSuite) TestConsumeIndoorClimateData() {
 
 	// Setuo
 	conf := loadConfigForTest(config.AsStringPtr("fixtures/testconfig_03.yml"))
-	collector := NewMqttCollector(conf, suite.logger)
+	collector := NewMqttCollector(conf, suite.logger, secretsManagerForTest())
 	ctx, cancelFunc := context.WithCancel(context.Background())
 
 	// Prepare
@@ -90,7 +90,7 @@ func (suite *MqttCollectorTestSuite) TestConsumeIndoorClimateData() {
 func (suite *MqttCollectorTestSuite) TestBrokerConnectError() {
 
 	conf := loadConfigForTest(config.AsStringPtr("fixtures/testconfig_04.yml"))
-	collector := NewMqttCollector(conf, suite.logger)
+	collector := NewMqttCollector(conf, suite.logger, secretsManagerForTest())
 	ctx, cancelFunc := context.WithCancel(context.Background())
 
 	suite.NotNil(collector.Run(ctx))

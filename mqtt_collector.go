@@ -8,10 +8,16 @@ import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	config "github.com/tommzn/go-config"
 	log "github.com/tommzn/go-log"
+	"github.com/tommzn/go-secrets"
+)
+
+const (
+	mqtt_username string = "MQTT_USERNAME"
+	mqtt_password string = "MQTT_PASSWORD"
 )
 
 // NewMqttCollector returns a new collector listen for MQTT messages to obtain indoor climate data.
-func NewMqttCollector(conf config.Config, logger log.Logger) *MqttCollector {
+func NewMqttCollector(conf config.Config, logger log.Logger, secretsManager secrets.SecretsManager) *MqttCollector {
 
 	mqttCollector := &MqttCollector{
 		logger:        logger,
@@ -20,7 +26,7 @@ func NewMqttCollector(conf config.Config, logger log.Logger) *MqttCollector {
 		subscriptions: []MqttSubscriptionConfig{},
 	}
 
-	mqttCollector.mqttOptions = mqttCollector.mqttClientOptionsFromConfig(conf)
+	mqttCollector.mqttOptions = mqttCollector.mqttClientOptionsFromConfig(conf, secretsManager)
 	return mqttCollector
 }
 
@@ -115,7 +121,7 @@ func (collector *MqttCollector) connectLostHandler(client mqtt.Client, err error
 }
 
 // MqttClientOptionsFromConfig extracts MQTT client settings from given config.
-func (collector *MqttCollector) mqttClientOptionsFromConfig(conf config.Config) *mqtt.ClientOptions {
+func (collector *MqttCollector) mqttClientOptionsFromConfig(conf config.Config, secretsmanager secrets.SecretsManager) *mqtt.ClientOptions {
 
 	broker := conf.Get("mqtt.broker", config.AsStringPtr("localhost"))
 	port := conf.GetAsInt("mqtt.port", config.AsIntPtr(1883))
@@ -125,5 +131,12 @@ func (collector *MqttCollector) mqttClientOptionsFromConfig(conf config.Config) 
 	options.SetClientID("indoorclimate_collector")
 	options.OnConnect = collector.connectHandler
 	options.OnConnectionLost = collector.connectLostHandler
+
+	if username, _ := secretsmanager.Obtain(mqtt_username); username != nil {
+		options.SetUsername(*username)
+	}
+	if password, _ := secretsmanager.Obtain(mqtt_password); password != nil {
+		options.SetPassword(*password)
+	}
 	return options
 }
