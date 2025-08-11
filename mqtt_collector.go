@@ -131,7 +131,6 @@ func (collector *MqttCollector) mqttClientOptionsFromConfig(conf config.Config, 
 	options.SetClientID("indoorclimate_collector")
 	options.OnConnect = collector.connectHandler
 	options.OnConnectionLost = collector.connectLostHandler
-
 	if username, _ := secretsmanager.Obtain(mqtt_username); username != nil {
 		options.SetUsername(*username)
 	}
