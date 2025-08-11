@@ -8,7 +8,7 @@ require (
 	github.com/tommzn/go-secrets v1.1.4
 	github.com/tommzn/hdb-core v1.0.4
 	github.com/tommzn/hdb-datasource-core v1.2.4
-	github.com/tommzn/hdb-datasource-indoorclimate v1.8.3
+	github.com/tommzn/hdb-datasource-indoorclimate v1.8.4
 	github.com/tommzn/hdb-datasource-indoorclimate/plugins v1.0.5
 	github.com/tommzn/hdb-datasource-indoorclimate/targets v1.0.12
 )
