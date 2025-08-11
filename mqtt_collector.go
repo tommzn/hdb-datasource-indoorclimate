@@ -2,8 +2,11 @@ package indoorclimate
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
 	"fmt"
 	oslog "log"
+	"strings"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	config "github.com/tommzn/go-config"
@@ -125,17 +128,28 @@ func (collector *MqttCollector) mqttClientOptionsFromConfig(conf config.Config, 
 
 	broker := conf.Get("mqtt.broker", config.AsStringPtr("localhost"))
 	port := conf.GetAsInt("mqtt.port", config.AsIntPtr(1883))
+	protocol := conf.Get("mqtt.protocol", config.AsStringPtr("tcp"))
 	options := mqtt.NewClientOptions()
 	options.SetOrderMatters(false)
-	options.AddBroker(fmt.Sprintf("tcp://%s:%d", *broker, *port))
+	options.AddBroker(fmt.Sprintf("%s://%s:%d", *protocol, *broker, *port))
 	options.SetClientID("indoorclimate_collector")
 	options.OnConnect = collector.connectHandler
 	options.OnConnectionLost = collector.connectLostHandler
+
 	if username, _ := secretsmanager.Obtain(mqtt_username); username != nil {
 		options.SetUsername(*username)
 	}
 	if password, _ := secretsmanager.Obtain(mqtt_password); password != nil {
 		options.SetPassword(*password)
+	}
+
+	if strings.HasPrefix(*protocol, "ssl") {
+		certpool := x509.NewCertPool()
+		tlsConfig := &tls.Config{
+			RootCAs:            certpool,
+			InsecureSkipVerify: false,
+		}
+		options.SetTLSConfig(tlsConfig)
 	}
 	return options
 }

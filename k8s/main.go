@@ -39,7 +39,7 @@ func bootstrap(ctx context.Context) (core.Collector, hdbcore.Runable, error) {
 	secretsManager := newSecretsManager()
 	conf := loadConfig()
 	logger := newLogger(conf, secretsManager, ctx)
-	datasource := indoorclimate.NewMqttCollector(conf, logger)
+	datasource := indoorclimate.NewMqttCollector(conf, logger, newSecretsManager())
 	if queue := conf.Get("hdb.queue", nil); queue != nil {
 		datasource.AppendTarget(targets.NewSqsTarget(conf, logger))
 	}
