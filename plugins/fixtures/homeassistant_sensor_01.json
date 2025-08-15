@@ -1,0 +1,9 @@
+{
+    "entity_id": "sensor.indoor_outdoor_meter_5497_humidity",
+    "name": "Indoor/Outdoor Meter 5497 Humidity",
+    "room": "Outdoor",
+    "time": "2025-08-15T11:10:11.554121+02:00",
+    "type_of_measurement": "humidity",
+    "unit": "%",
+    "value": 68.0
+}
