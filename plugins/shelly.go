@@ -52,7 +52,7 @@ type ShellyHT_ExternalPower struct {
 	Present bool `json:"present"`
 }
 
-// NewMockPlugin creates a new mock plugin.
+// NewMockPlugin creates a new plugin.
 func NewShellyHTPlugin(logger log.Logger) *ShellyHTPlugin {
 	return &ShellyHTPlugin{logger: logger}
 }
