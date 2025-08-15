@@ -134,6 +134,8 @@ func newDevicePlugin(pluginKey *string, logger log.Logger) indoorclimate.DeviceP
 		return plugins.NewShellyHTPlugin(logger)
 	case indoorclimate.PLUGIN_LOGGER:
 		return plugins.NewLoggerPlugin(logger)
+	case indoorclimate.PLUGIN_HOME_ASSISTANT:
+		return plugins.NewHomeAssistantPlugin(logger)
 	default:
 		return nil
 	}
