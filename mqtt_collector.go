@@ -151,5 +151,6 @@ func (collector *MqttCollector) mqttClientOptionsFromConfig(conf config.Config, 
 		}
 		options.SetTLSConfig(tlsConfig)
 	}
+	collector.logger.Infof("MQTT Broker: %v", options.Servers)
 	return options
 }
